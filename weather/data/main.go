@@ -32,8 +32,8 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var (
-	// BUILD_VERSION = "2.1.0" // x-release-please-version
-	version = "2.1.0" // x-release-please-version
+	// BUILD_VERSION = "1.0.0" // x-release-please-version
+	version = "1.0.0" // x-release-please-version
 	commit  = "none"
 	date    = "unknown"
 	// githubUrl = "none"
