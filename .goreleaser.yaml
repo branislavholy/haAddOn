@@ -1,0 +1,71 @@
+#
+# Goreleaser configuration.
+#
+# See also: .github/workflows/build.yml
+
+version: 2
+
+project_name: ha-addon
+
+# https://goreleaser.com/customization/build
+builds:
+  - id: weather_build
+    dir: weather/data
+    binary: weather
+    hooks:
+      pre:
+        - cmd: go mod tidy
+          dir: weather/data
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+    goarch:
+      - arm64
+      - amd64
+    mod_timestamp: "{{ .CommitTimestamp }}"
+    flags:
+      - -trimpath
+    ldflags:
+      - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{ .CommitDate }} -X main.binary={{ .Binary }} -X main.githubUrl={{ .GitURL }}/{{ .ProjectName }} -X main.builtBy=goreleaser
+
+# Config the archives filenames, format, and other options.
+# https://goreleaser.com/customization/archive
+archives:
+  - id: weather_archive
+    formats: [tar.gz]
+    ids:
+      - weather_build
+    # Disable the wrapping parent folder
+    wrap_in_directory: false
+    # Strip any subdirectories from the binary itself
+    strip_binary_directory: true
+    builds_info:
+      mtime: "{{ .CommitTimestamp }}"
+    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
+    # use zip for windows archives
+    format_overrides:
+      - formats: [ 'zip' ]
+        goos: windows
+
+# Config the checksum filename
+# https://goreleaser.com/customization/checksum
+checksum:
+  name_template: "checksums.txt"
+
+# Changelog configuration (will be in the github release).
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - "^docs:"
+      - "^test:"
+
+# A footer to add to all releases.
+release:
+  footer: >-
+
+    ---
+
+    Released by [GoReleaser](https://github.com/goreleaser/goreleaser).

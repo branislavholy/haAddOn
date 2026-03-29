@@ -1,0 +1,24 @@
+name: Go lang ci lint
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  golangci:
+    strategy:
+      matrix:
+        binaryPath:
+          - weather/data
+          # - weather2/data
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: latest
+          working-directory: ${{ matrix.binaryPath }}

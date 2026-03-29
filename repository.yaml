@@ -1,0 +1,4 @@
+# https://developers.home-assistant.io/docs/add-ons/repository#repository-configuration
+name: Branislav Home Assistant Add-ons
+url: 'https://github.com/branislavholy/haAddOn'
+maintainer: Branislav Holý <branislav.holy@gmail.com>

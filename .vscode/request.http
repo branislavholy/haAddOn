@@ -1,0 +1,8 @@
+@homeAssistantUrl  = http://localhost:8000/weatherstation/updateweatherstation2.php
+@homeAssistantData = ID=garni2055&PASSWORD=garni2055&action=updateraww&realtime=1&rtfreq=5&dateutc=now&baromin=29.32&tempf=57.9&dewptf=35.7&humidity=44&windspeedmph=0.0&windgustmph=0.0&winddir=114&rainin=0.0&dailyrainin=0.0&solarradiation=30.0&UV=0.0&indoortempf=67.8&indoorhumidity=60
+
+POST {{homeAssistantUrl}}?{{homeAssistantData}}
+Content-type: application/x-www-form-urlencoded
+
+### Go
+# curl -X POST 'http://localhost:8000/weatherstation/updateweatherstation2.php?ID=garni2055&PASSWORD=garni2055&action=updateraww&realtime=1&rtfreq=5&dateutc=now&baromin=29.32&tempf=57.9&dewptf=35.7&humidity=44&windspeedmph=0.0&windgustmph=0.0&winddir=114&rainin=0.0&dailyrainin=0.0&solarradiation=0.0&UV=0.0&indoortempf=67.8&indoorhumidity=60'
