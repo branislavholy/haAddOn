@@ -1,6 +1,6 @@
 ARG BUILD_FROM
 
-FROM golang:1.25.5-alpine AS builder
+FROM golang:1.26.1-alpine AS builder
 WORKDIR /app
 COPY data/ .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /tmp/weather
