@@ -1,6 +1,17 @@
 version: 2
 
 updates:
+  - package-ecosystem: docker
+    directory: weather
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: fix(deps)
+    groups:
+      golang-deps:
+        patterns:
+          - "*"
+
   - package-ecosystem: github-actions
     directory: /
     schedule:
@@ -13,7 +24,7 @@ updates:
           - "*"
 
   - package-ecosystem: gomod
-    directory: /
+    directory: "/"
     schedule:
       interval: monthly
     commit-message:

@@ -8,7 +8,10 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o /tmp/weather
 # ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
+# x-release-please-version
 # ARG RELEASE_TAG="v2.0.0"
+# x-release-please-end
+
 # ARG REPO="your-username/your-repo"
 
 # Download the correct binary for the current architecture
