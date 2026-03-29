@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.0 (2026-03-29)
+
+
+### Features
+
+* init and add wather ([7a5e90b](https://github.com/branislavholy/haAddOn/commit/7a5e90b1300949e74b460aa5d23ec09f2a59534c))
+
 ## [2.1.0](https://github.com/branislavholy/haAddOnTest/compare/v2.0.0...v2.1.0) (2026-03-25)
 
 
