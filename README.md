@@ -19,11 +19,13 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build
 
 ## Building Docker Image
 
+<!-- x-release-please-start-version -->
 ```bash
 cd ~/workspace/haAddOn/weather
-podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:2.0.0' .
+podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.0.1' .
 
 ```
+<!-- x-release-please-end -->
 
 ## Listing Container Images
 
@@ -55,9 +57,11 @@ podman run --rm -it weather:latest /usr/bin/weather
 ```
 
 ### Remove image
+<!-- x-release-please-start-version -->
 ```bash
-podman rmi weather:2.0.0 weather:latest
+podman rmi weather:1.0.1 weather:latest
 ```
+<!-- x-release-please-end -->
 
 ## Building Alternative Image
 
