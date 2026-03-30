@@ -8,7 +8,7 @@ updates:
     commit-message:
       prefix: fix(deps)
     groups:
-      golang-deps:
+      docker-deps:
         patterns:
           - "*"
 
@@ -23,8 +23,9 @@ updates:
         patterns:
           - "*"
 
-  - package-ecosystem: gomod
-    directory: "/"
+  - package-ecosystem: "gomod"
+    directories:
+      - "**/*"
     schedule:
       interval: monthly
     commit-message:

@@ -1,4 +1,7 @@
 ![version](https://img.shields.io/static/v1?label=version&message=1.0.0&color=blue) <!-- x-release-please-version -->
+[![Build](https://github.com/branislavholy/haAddOn/actions/workflows/build.yml/badge.svg)](.github/workflows/build.yml)
+[![dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)](.github/dependabot.yml)
+[![release-please](https://img.shields.io/badge/release--please-enabled-brightgreen?logo=google)](.github/release-please.yml)
 
 # Weather Add-On
 
@@ -17,7 +20,7 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build
 ## Building Docker Image
 
 ```bash
-cd ~/workspace/haAddOnTest/weather
+cd ~/workspace/haAddOn/weather
 podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:2.0.0' .
 
 ```
