@@ -1,4 +1,4 @@
-![version](https://img.shields.io/static/v1?label=version&message=1.0.0&color=blue) <!-- x-release-please-version -->
+![version](https://img.shields.io/static/v1?label=version&message=1.0.1&color=blue) <!-- x-release-please-version -->
 [![Build](https://github.com/branislavholy/haAddOn/actions/workflows/build.yml/badge.svg)](.github/workflows/build.yml)
 [![dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)](.github/dependabot.yml)
 [![release-please](https://img.shields.io/badge/release--please-enabled-brightgreen?logo=google)](.github/release-please.yml)

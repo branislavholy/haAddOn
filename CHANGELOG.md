@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/branislavholy/haAddOn/compare/v1.0.0...v1.0.1) (2026-03-30)
+
+
+### Bug Fixes
+
+* add check dependabot for docker ([3fa93b6](https://github.com/branislavholy/haAddOn/commit/3fa93b69e71c792758639d75380de13f7c3d3a26))
+* **deps:** bump golang.org/x/text ([199f943](https://github.com/branislavholy/haAddOn/commit/199f943d7d4cb45d29f1a1e59341de4b72b8d4ad))
+* fix dependabot and Dockerfile ([701f086](https://github.com/branislavholy/haAddOn/commit/701f086d2be175bc6543ceec7a8f16b77bfd0997))
+
 ## 1.0.0 (2026-03-29)
 
 
