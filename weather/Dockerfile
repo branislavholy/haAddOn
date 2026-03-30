@@ -1,7 +1,7 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-ARG RELEASE_TAG="1.0.0" # x-release-please-version
+ARG RELEASE_TAG="1.0.2" # x-release-please-version
 
 WORKDIR /tmp
 RUN curl -L "https://github.com/branislavholy/haAddOn/releases/download/v${RELEASE_TAG}/weather_${TARGETOS}_${TARGETARCH}.tar.gz" -o weather_${TARGETOS}_${TARGETARCH}.tar.gz && \
