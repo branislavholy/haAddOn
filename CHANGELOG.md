@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.3](https://github.com/branislavholy/haAddOn/compare/v1.0.2...v1.0.3) (2026-03-30)
+
+
+### Bug Fixes
+
+* update dockerfile ([eae5ee1](https://github.com/branislavholy/haAddOn/commit/eae5ee1e89e80b2e59638fa4c160c7745ed43b90))
+
 ## [1.0.2](https://github.com/branislavholy/haAddOn/compare/v1.0.1...v1.0.2) (2026-03-30)
 
 
