@@ -24,8 +24,6 @@ builds:
     goarch:
       - arm64
       - amd64
-    goarm:
-      - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
@@ -45,7 +43,11 @@ archives:
     strip_binary_directory: true
     builds_info:
       mtime: "{{ .CommitTimestamp }}"
-    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
+    # name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
+    name_template: >-
+      {{ .Binary }}_
+      {{- .Os }}_
+      {{- if eq .Arch "arm64" }}aarch64{{ else }}{{ .Arch }}{{ end }}
     # use zip for windows archives
     format_overrides:
       - formats: [ 'zip' ]
