@@ -24,7 +24,8 @@ builds:
     goarch:
       - arm64
       - amd64
-      - aarch64
+    goarm:
+      - 7
     mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
