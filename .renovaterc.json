@@ -1,5 +1,11 @@
 {
   "extends": ["config:base"],
+  "packageRules": [
+    {
+      "matchPackagePatterns": ["ghcr.io/home-assistant/"],
+      "groupName": "fix(home-assistant-base)"
+    }
+  ],
   "docker": {
     "enabled": true
   },
