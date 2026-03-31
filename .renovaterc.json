@@ -1,12 +1,11 @@
 {
   "extends": ["config:base"],
+  "dependencyDashboardApproval": false,
   "packageRules": [
     {
       "matchPackagePatterns": ["ghcr.io/home-assistant/"],
       "groupName": "home-assistant-base-images",
-      "matchUpdateTypes": ["minor", "patch"],
-      "automerge": true,
-      "platformAutomerge": true
+      "dependencyDashboardApproval": false
     }
   ],
   "docker": {
