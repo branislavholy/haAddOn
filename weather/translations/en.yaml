@@ -5,3 +5,9 @@ configuration:
   language:
     name: "Language"
     description: "Controls the language of the units of measurement for the app."
+  username:
+    name: "MQTT Username"
+    description: "Username for the MQTT service API."
+  password:
+    name: "MQTT Password"
+    description: "Password for the MQTT service API."
