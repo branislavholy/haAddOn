@@ -66,8 +66,8 @@ podman rmi weather:1.1.0 weather:latest
 ## Building Alternative Image
 
 ```bash
-podman build --pull --rm -f 'workspace/haAddOnTest/weather/Dockerfile' -t 'branislav:latest' 'workspace/haAddOnTest/weather'
-podman run --rm -v /home/branislav/workspace/haAddOnTest/weather/data:/data -p 8000:80  localhost/branislav:latest
+podman build --pull --rm -f 'workspace/haAddOn/weather/Dockerfile' -t 'branislav:latest' 'workspace/haAddOn/weather'
+podman run --rm -v /home/branislav/workspace/haAddOn/weather/data:/data -p 8000:80  localhost/branislav:latest
 
 podman run --rm -v /home -p 8000:80 -it localhost/test:latest bash
 https://github.com/home-assistant/cli/blob/master/.github/workflows/build.yml

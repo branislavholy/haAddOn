@@ -37,7 +37,7 @@ var (
 	commit  = "none"
 	date    = "unknown"
 	// githubUrl = "none"
-	githubUrl = "https://github.com/branislavholy/haAddOnTest/ha-addon"
+	githubUrl = "https://github.com/branislavholy/haAddOn/ha-addon"
 	binary    = "none"
 
 	// Do not change this variable.
