@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/branislavholy/haAddOn/compare/v1.2.1...v1.2.2) (2026-03-31)
+
+
+### Bug Fixes
+
+* add goreleaser rename ([7bbfc2c](https://github.com/branislavholy/haAddOn/commit/7bbfc2c0ce38972c048a4e07c82a7b3d6d4fa2fd))
+
 ## [1.2.1](https://github.com/branislavholy/haAddOn/compare/v1.2.0...v1.2.1) (2026-03-31)
 
 
