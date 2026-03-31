@@ -26,5 +26,5 @@ weather/data/weather
 .env
 
 # custom
-*.sh
+# *.sh
 coverage.out
