@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.2.0](https://github.com/branislavholy/haAddOn/compare/v1.1.0...v1.2.0) (2026-03-31)
+
+
+### Features
+
+* add weather ha variables ([44196f9](https://github.com/branislavholy/haAddOn/commit/44196f9d40b7ce574ad9cce6055cd8168c21238c))
+
+
+### Bug Fixes
+
+* test renovate ([83edc6b](https://github.com/branislavholy/haAddOn/commit/83edc6bf450447afd5703459648e98b9065889a0))
+* update renovate ([575e97b](https://github.com/branislavholy/haAddOn/commit/575e97b75c62d8e418690584af255b9c5d893483))
+* update renovate configs ([0e85ce4](https://github.com/branislavholy/haAddOn/commit/0e85ce48d2f1a8b56a4011b6cf825d6681f6cbf3))
+* update renovate configs ([f85bff2](https://github.com/branislavholy/haAddOn/commit/f85bff2c6371f3bd66b30a4af85f51932cf2aff0))
+* update weather repo name ([d77e14c](https://github.com/branislavholy/haAddOn/commit/d77e14c094c4aba77667c673ad0fb03503647aa2))
+
 ## [1.1.0](https://github.com/branislavholy/haAddOn/compare/v1.0.3...v1.1.0) (2026-03-31)
 
 
