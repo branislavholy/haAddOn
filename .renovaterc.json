@@ -1,0 +1,15 @@
+{
+  "extends": ["config:base"],
+  "docker": {
+    "enabled": true
+  },
+  "regexManagers": [
+    {
+      "fileMatch": ["weather/build\\.yaml"],
+      "matchStrings": [
+        "(?<depName>ghcr\\.io/home-assistant/[^:]+):(?<currentValue>[^\\s]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}
