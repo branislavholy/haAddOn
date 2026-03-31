@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1](https://github.com/branislavholy/haAddOn/compare/v1.2.0...v1.2.1) (2026-03-31)
+
+
+### Bug Fixes
+
+* add goreleaser goarm ([62ec7f9](https://github.com/branislavholy/haAddOn/commit/62ec7f9f9af4998ad771c3360775e9fa2ef2fab4))
+* add goreleaser platform ([8b82b5a](https://github.com/branislavholy/haAddOn/commit/8b82b5a177cbda909c92c478543e4297ac81e6b0))
+
 ## [1.2.0](https://github.com/branislavholy/haAddOn/compare/v1.1.0...v1.2.0) (2026-03-31)
 
 
