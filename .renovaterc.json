@@ -3,7 +3,10 @@
   "packageRules": [
     {
       "matchPackagePatterns": ["ghcr.io/home-assistant/"],
-      "groupName": "home-assistant-base-images"
+      "groupName": "home-assistant-base-images",
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "platformAutomerge": true
     }
   ],
   "docker": {
