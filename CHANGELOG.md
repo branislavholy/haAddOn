@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.1.0](https://github.com/branislavholy/haAddOn/compare/v1.0.3...v1.1.0) (2026-03-31)
+
+
+### Features
+
+* add renovate configs ([0d9e012](https://github.com/branislavholy/haAddOn/commit/0d9e012cbf2064884f3135451f37fe6125531b57))
+
+
+### Bug Fixes
+
+* update dockerfile ([3fa1564](https://github.com/branislavholy/haAddOn/commit/3fa156413668665754b946268828b13cad4a7712))
+* update weather variables ([dd171c2](https://github.com/branislavholy/haAddOn/commit/dd171c2aa6d8013282dade4f39652d34a967cfc9))
+
 ## [1.0.3](https://github.com/branislavholy/haAddOn/compare/v1.0.2...v1.0.3) (2026-03-30)
 
 
