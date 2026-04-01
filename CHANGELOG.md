@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.5](https://github.com/branislavholy/haAddOn/compare/v1.2.4...v1.2.5) (2026-04-01)
+
+
+### Bug Fixes
+
+* update weather const ([fbfca85](https://github.com/branislavholy/haAddOn/commit/fbfca85c91d2b360f22209b3057fa789d2c76e33))
+
 ## [1.2.4](https://github.com/branislavholy/haAddOn/compare/v1.2.3...v1.2.4) (2026-04-01)
 
 
