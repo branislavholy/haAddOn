@@ -4,9 +4,9 @@
   "packageRules": [{
     "groupName": "home-assistant-base-images",
     "dependencyDashboardApproval": false,
-      "matchPackageNames": [
-        "*"
-      ]
+    "matchPackageNames": [
+    "*"
+    ]
   }],
   "customManagers": [
     {
