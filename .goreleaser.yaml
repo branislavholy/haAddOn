@@ -82,7 +82,7 @@ changelog:
       - "^test:"
   groups:
     - title: 'Dependency Updates'
-      regexp: "^.*(chore|deps):.*$"
+      regexp: "^.*(chore|deps).*$"
       order: 1
     - title: 'Weather tool'
       regexp: "^.*weather.*$"
