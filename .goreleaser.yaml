@@ -49,18 +49,21 @@ archives:
     builds_info:
       mtime: "{{ .CommitTimestamp }}"
     # name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
-    # name_template: >-
-    #   {{ .Binary }}_
-    #   {{- .Os }}_
-    #   {{- if eq .Arch "arm64" }}aarch64{{ else }}{{ .Arch }}{{ end }}
+    name_template: >-
+      {{ .Binary }}_
+      {{- .Os }}_
+      {{- if eq .Arch "arm64" }}aarch64
+      {{- else if eq .Arch "386" }}i386
+      {{- else if eq .Arch "arm" }}{{ if eq .Arm "6" }}armhf{{ else }}armv7{{ end }}
+      {{- else }}{{ .Arch }}{{ end }}
+    # mapping:
+    #   amd64: amd64      # Already matches
+    #   386: i386        # Maps '386' to 'i386'
+    #   arm64: aarch64   # Maps 'arm64' to 'aarch64'
+    #   armv6: armhf     # Optional: maps arm v6 to armhf
+    #   armv7: armv7     # Optional: explicitly name v7
+
     # use zip for windows archives
-    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
-    replacements:
-      amd64: amd64      # Already matches
-      386: i386        # Maps '386' to 'i386'
-      arm64: aarch64   # Maps 'arm64' to 'aarch64'
-      armv6: armhf     # Optional: maps arm v6 to armhf
-      armv7: armv7     # Optional: explicitly name v7
     format_overrides:
       - formats: [ 'zip' ]
         goos: windows
