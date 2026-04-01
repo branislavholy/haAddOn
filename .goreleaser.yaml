@@ -22,8 +22,13 @@ builds:
       - linux
       - windows
     goarch:
-      - arm64
-      - amd64
+      - arm64   # for aarch64
+      - amd64   # for amd64
+      - "386"   # for i386
+      - arm     # for armhf/armv7
+    goarm:
+      - 6       # commonly maps to armel/armhf (v6)
+      - 7       # commonly maps to armv7
     mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
@@ -44,11 +49,18 @@ archives:
     builds_info:
       mtime: "{{ .CommitTimestamp }}"
     # name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
-    name_template: >-
-      {{ .Binary }}_
-      {{- .Os }}_
-      {{- if eq .Arch "arm64" }}aarch64{{ else }}{{ .Arch }}{{ end }}
+    # name_template: >-
+    #   {{ .Binary }}_
+    #   {{- .Os }}_
+    #   {{- if eq .Arch "arm64" }}aarch64{{ else }}{{ .Arch }}{{ end }}
     # use zip for windows archives
+    name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
+    replacements:
+      amd64: amd64      # Already matches
+      386: i386        # Maps '386' to 'i386'
+      arm64: aarch64   # Maps 'arm64' to 'aarch64'
+      armv6: armhf     # Optional: maps arm v6 to armhf
+      armv7: armv7     # Optional: explicitly name v7
     format_overrides:
       - formats: [ 'zip' ]
         goos: windows
@@ -65,6 +77,13 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
+  groups:
+    - title: 'Dependency Updates'
+      regexp: "^.*(chore|deps):.*$"
+      order: 1
+    - title: 'Weather tool'
+      regexp: "^.*weather.*$"
+      order: 2
 
 # A footer to add to all releases.
 release:

@@ -2,11 +2,12 @@
   "extends": ["config:base"],
   "prHourlyLimit": 0,
   "prConcurrentLimit": 0,
-  "dependencyDashboardApproval": false,
+  "dependencyDashboard": true,
   "packageRules": [
     {
-      "matchPackagePatterns": ["ghcr.io/home-assistant/"],
+      "matchPackagePatterns": ["*"],
       "groupName": "home-assistant-base-images",
+      "automerge": false,
       "dependencyDashboardApproval": false
     }
   ],
