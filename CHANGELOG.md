@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.4](https://github.com/branislavholy/haAddOn/compare/v1.2.3...v1.2.4) (2026-04-01)
+
+
+### Bug Fixes
+
+* test renovate again ([62164ef](https://github.com/branislavholy/haAddOn/commit/62164efeaf90aa9f1cda751a9bb9cd06e8bddfd6))
+* update renovate ([355790d](https://github.com/branislavholy/haAddOn/commit/355790d889b7cdea5ce468b705c9f1e69a37cbb7))
+* update renovate config ([6f1ec1a](https://github.com/branislavholy/haAddOn/commit/6f1ec1af87c55968d82cc3ee23c55af9fafe2b23))
+* **weather:** clean main.go ([87b8a9d](https://github.com/branislavholy/haAddOn/commit/87b8a9dd36f2add76dc31a06c3f87d4b6f868c54))
+* **weather:** test create pr ([d3a2255](https://github.com/branislavholy/haAddOn/commit/d3a225529f2353bf47d0ce65c8224d40a41570ab))
+
 ## [1.2.3](https://github.com/branislavholy/haAddOn/compare/v1.2.2...v1.2.3) (2026-04-01)
 
 
