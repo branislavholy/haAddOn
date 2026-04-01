@@ -1,0 +1,15 @@
+{
+  "$schema": "https://renovatebot.com",
+  "extends": ["config:recommended"],
+   "dependencyDashboardApproval": false,
+  "regexManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["weather/build\\.yaml"],
+      "matchStrings": [
+        "(?<depName>ghcr\\.io/home-assistant/[^:]+):(?<currentValue>[^\\s]+)"
+      ],
+      "datasourceTemplate": "docker"
+    }
+  ]
+}
