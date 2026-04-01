@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.3](https://github.com/branislavholy/haAddOn/compare/v1.2.2...v1.2.3) (2026-04-01)
+
+
+### Bug Fixes
+
+* add renovate ([38410b0](https://github.com/branislavholy/haAddOn/commit/38410b00710499c928d5c6bbcd7f7c067fa6ce0f))
+* test renovate ([17b95c4](https://github.com/branislavholy/haAddOn/commit/17b95c4a7745d88b86313426fd41b969b9ecabc2))
+* update dockerfile ([898917e](https://github.com/branislavholy/haAddOn/commit/898917e931e695eeb0785eda87ea0c830fc1fbe6))
+* update goreleaser ([e4e6dc4](https://github.com/branislavholy/haAddOn/commit/e4e6dc412a40f2a5d86d98b1fe99558565972359))
+* update renovate config ([5d5603d](https://github.com/branislavholy/haAddOn/commit/5d5603de2586dbb31d4582f96ee7fbb6fddab84b))
+
 ## [1.2.2](https://github.com/branislavholy/haAddOn/compare/v1.2.1...v1.2.2) (2026-03-31)
 
 
