@@ -22,7 +22,6 @@ const (
 	// broker   = "tcp://192.168.10.20:1883"
 	clientID = "go-mqtt-subscriber"
 	topic    = "homeassistant/sensor/weather/state"
-	// configJson = `{"default_entity_id":"sensor.weather_station_external","device":{"hw_version":0,"identifiers":["weather_station_external"],"manufacturer":"GARNI WEATHER","model":"External sensors","model_id":"2055","name":"Weather GARNI","sw_version":"2.08","serial_number":"0.1","configuration_url":"http://<localhostOnGarniWifi>"},"device_class":"temperature","enabled_by_default":true,"origin":{"name":"GARNI_2055","sw":"2.08","url":"http://127.0.0.1:8000/weatherstation/updateweatherstation.php"},"state_class":"measurement","state_topic":"homeassistant/sensor/weather/temperature/state","unique_id":"weather_external_01","unit_of_measurement":"°C","value_template":"{{ value_json.temperature}}","name":"Station temperature out"}`
 )
 
 var mqttMsgChan = make(chan mqtt.Message)

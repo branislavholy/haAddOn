@@ -99,5 +99,5 @@ release:
 publishers:
   - name: "generate-weather-changelog"
     ids:
-      - weather-build
+      - weather_build
     cmd: sh -c "echo '{{ .Changelog }}' > ./weather/CHANGELOG.md"
