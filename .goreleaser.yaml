@@ -95,3 +95,9 @@ release:
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
+
+publishers:
+  - name: "generate-weather-changelog"
+    ids:
+      - weather-build
+    cmd: sh -c "echo '{{ .Changelog }}' > ./weather/CHANGELOG.md"
