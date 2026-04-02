@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/branislavholy/haAddOn/compare/v1.3.1...v1.3.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* update weather run.sh ([359ce63](https://github.com/branislavholy/haAddOn/commit/359ce63ce9f34cfbd4cd3b885ee4df9e1a5a5b90))
+
 ## [1.3.1](https://github.com/branislavholy/haAddOn/compare/v1.3.0...v1.3.1) (2026-04-02)
 
 
