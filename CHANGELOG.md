@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.3](https://github.com/branislavholy/haAddOn/compare/v1.4.2...v1.4.3) (2026-04-02)
+
+
+### Bug Fixes
+
+* **weather:** repare windchill ([057e768](https://github.com/branislavholy/haAddOn/commit/057e768266ee526512db022907b2b22a8c54abfa))
+
 ## [1.4.2](https://github.com/branislavholy/haAddOn/compare/v1.4.1...v1.4.2) (2026-04-02)
 
 
