@@ -30,7 +30,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var (
-	version = "1.4.2" // x-release-please-version
+	version = "1.4.1" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -330,8 +330,8 @@ var unitsMetric = map[string]SensorConfig{
 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "hPa", Measurement: "measurement"},
-	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"},
-	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"},
+	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "km/h", Measurement: "measurement"},
+	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "km/h", Measurement: "measurement"}, // suggested_unit_of_measurement
 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
@@ -378,10 +378,10 @@ func convertToMetric(key, value string) string {
 		// Fahrenheit to Celsius
 		converted = (val - 32) * 5 / 9
 	case "windspeedmph", "windgustmph":
-		// mph to km/h
-		// converted = val * 1.609344
-		// mph to m/s
-		converted = val * 0.44704
+		// mph to km/hs
+		converted = val * 1.609344
+		// // mph to m/s
+		// converted = val * 0.44704
 	case "baromin":
 		// inHg to hPa
 		converted = val * 33.8639
@@ -554,7 +554,8 @@ func calculateWindChill(tempF, windSpeedMph string) string {
 	wc := 35.74 +
 		(0.6215 * tempfVal) -
 		(35.75 * math.Pow(windspeedVal, 0.16)) +
-		(0.4275 * math.Pow(windspeedVal, 0.16))
+		// (0.4275 * math.Pow(windspeedVal, 0.16))
+		(0.4275 * tempfVal * math.Pow(windspeedVal, 0.16))
 	return strconv.FormatFloat(wc, 'f', 2, 64)
 }
 
