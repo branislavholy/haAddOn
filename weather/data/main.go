@@ -19,7 +19,6 @@ import (
 )
 
 const (
-	// broker   = "tcp://192.168.10.20:1883"
 	clientID = "go-mqtt-subscriber"
 	topic    = "homeassistant/sensor/weather/state"
 )
@@ -31,13 +30,13 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var (
-	// BUILD_VERSION = "1.2.5" // x-release-please-version
 	version = "1.2.5" // x-release-please-version
-	commit  = "none"
-	date    = "unknown"
-	// githubUrl = "none"
+	// Define by GoReleaser
+	commit = "none"
+	date   = "unknown"
+	binary = "none"
+
 	githubUrl = "https://github.com/branislavholy/haAddOn/ha-addon"
-	binary    = "none"
 
 	// Do not change this variable.
 	// It is define device in a HomeAssistant
@@ -451,7 +450,8 @@ func getLocalizedName(sensorKey, language string) string {
 }
 
 // loadConfig loads configuration from file with fallback to defaults
-func loadConfig(configPath string) Config {
+// func loadConfig(configPath string) Config {
+func loadConfig() Config {
 	defaultConfig := Config{
 		MQTT: struct {
 			Host     string `json:"host"`
@@ -472,43 +472,68 @@ func loadConfig(configPath string) Config {
 		Language: "en",
 	}
 
-	// Try to read config file
-	file, err := os.ReadFile(configPath)
-	if err != nil {
-		if os.IsNotExist(err) {
-			log.Printf("WARN: Config file not found at %s, using defaults", configPath)
-		} else {
-			log.Printf("ERROR: Failed to read config file: %v, using defaults", err)
-		}
-		return defaultConfig
-	}
+	// // Try to read config file
+	// file, err := os.ReadFile(configPath)
+	// if err != nil {
+	// 	if os.IsNotExist(err) {
+	// 		log.Printf("WARN: Config file not found at %s, using defaults", configPath)
+	// 	} else {
+	// 		log.Printf("ERROR: Failed to read config file: %v, using defaults", err)
+	// 	}
+	// 	return defaultConfig
+	// }
 
 	// Parse JSON config
 	var config Config
-	if err := json.Unmarshal(file, &config); err != nil {
-		log.Printf("ERROR: Failed to parse config JSON: %v, using defaults", err)
-		return defaultConfig
-	}
+	// if err := json.Unmarshal(file, &config); err != nil {
+	// 	log.Printf("ERROR: Failed to parse config JSON: %v, using defaults", err)
+	// 	return defaultConfig
+	// }
 
-	// Validate and fill missing values with defaults
-	if config.MQTT.Host == "" {
+	// Override with environment variables if set
+	if envHost := os.Getenv("MQTT_HOSTNAME"); envHost != "" {
+		config.MQTT.Host = envHost
+	} else {
 		config.MQTT.Host = defaultConfig.MQTT.Host
 	}
-	if config.MQTT.Port == 0 {
+
+	if envPort := os.Getenv("MQTT_PORT"); envPort != "" {
+		if port, err := strconv.Atoi(envPort); err == nil {
+			config.MQTT.Port = port
+		} else {
+			log.Printf("ERROR: Failed to parse MQTT_PORT %q, using default", envPort)
+			config.MQTT.Port = defaultConfig.MQTT.Port
+		}
+	} else {
 		config.MQTT.Port = defaultConfig.MQTT.Port
 	}
-	if config.MQTT.Username == "" {
+
+	if envUser := os.Getenv("MQTT_USERNAME"); envUser != "" {
+		config.MQTT.Username = envUser
+	} else {
 		config.MQTT.Username = defaultConfig.MQTT.Username
 	}
-	if config.MQTT.Password == "" {
-		config.MQTT.Password = defaultConfig.MQTT.Password
+
+	if envPass := os.Getenv("MQTT_PASSWORD"); envPass != "" {
+		config.MQTT.Password = envPass
+	} else {
+		log.Printf("ERROR: MQTT_PASSWORD is not defined in environment variables")
+		// os.Exit(1)
 	}
-	if config.UnitOfMeasurement == "" {
-		config.UnitOfMeasurement = defaultConfig.UnitOfMeasurement
-	}
-	if config.Language == "" {
-		config.Language = defaultConfig.Language
-	}
+
+	// // Validate and fill missing values with defaults
+	// if config.MQTT.Host == "" {
+	// 	config.MQTT.Host = defaultConfig.MQTT.Host
+	// }
+	// if config.MQTT.Port == 0 {
+	// 	config.MQTT.Port = defaultConfig.MQTT.Port
+	// }
+	// if config.MQTT.Username == "" {
+	// 	config.MQTT.Username = defaultConfig.MQTT.Username
+	// }
+	// if config.MQTT.Password == "" {
+	// 	config.MQTT.Password = defaultConfig.MQTT.Password
+	// }
 	if config.UnitOfMeasurement == "" {
 		config.UnitOfMeasurement = defaultConfig.UnitOfMeasurement
 	}
@@ -516,7 +541,10 @@ func loadConfig(configPath string) Config {
 		config.Language = defaultConfig.Language
 	}
 
-	log.Printf("INFO: Config loaded successfully from %s", configPath)
+	log.Printf("INFO: Load variable host: '%s'", config.MQTT.Host)
+	log.Printf("INFO: Load variable port: '%d'", config.MQTT.Port)
+	log.Printf("INFO: Load variable username: '%s'", config.MQTT.Username)
+	// log.Printf("INFO: Config loaded successfully from %s", configPath)
 	return config
 }
 
@@ -601,9 +629,8 @@ func calculateWindDirSite(windDir string) string {
 func main() {
 
 	// Load configuration with fallback to defaults
-	config := loadConfig("/data/options.json")
-
-	fmt.Printf("Value from config: %s\n", config.UnitOfMeasurement)
+	// config := loadConfig("/data/options.json")
+	config := loadConfig()
 
 	// // Now you can initialize your MQTT client
 	// broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
@@ -655,7 +682,7 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 			payload, _ := json.Marshal(localSenzor)
 			// payload, _ := json.MarshalIndent(localSenzor, "", "  ") // prettyJSON
-			fmt.Printf("....Published: %s\n", payload)
+			// fmt.Printf("....Published: %s\n", payload)
 
 			// Publish to the broker
 			// topic := fmt.Sprintf(topicConfig, localSenzor.Name)
@@ -770,14 +797,16 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 	}
 	myLog("Info", "Converted data:", jsonData)
 	// payload, err := json.MarshalIndent(sensors, "", "  ")
-	payload, err := json.Marshal(sensors)
-	if err != nil {
-		log.Fatalf("Error marshaling sensors: %s", err)
-	}
+
+	// Correct logging
+	// payload, err := json.Marshal(sensors)
+	// if err != nil {
+	// 	log.Fatalf("Error marshaling sensors: %s", err)
+	// }
 
 	// fmt.Println("--- Registered Sensors Configuration ---")
 	// // fmt.Println(string(payload))
-	fmt.Printf("..Published: %s\n", payload)
+	// fmt.Printf("..Published: %s\n", payload)
 
 	opts := mqtt.NewClientOptions()
 
@@ -785,8 +814,10 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
 	fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
 
-	opts.SetUsername(os.Getenv("MQTT_USERNAME"))
-	opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
+	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
+	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
+	opts.SetUsername(config.MQTT.Username)
+	opts.SetPassword(config.MQTT.Password)
 	opts.AddBroker(broker)
 	opts.SetClientID(clientID)
 	opts.SetDefaultPublishHandler(messagePubHandler)
@@ -816,7 +847,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 	registerSensors(client, sensors)
 
 	client.Publish(topic, 1, true, jsonData).Wait()
-	fmt.Printf("..Published State: %s\n", jsonData)
+	// fmt.Printf("..Published State: %s\n", jsonData)
 
 	client.Disconnect(250)
 }
