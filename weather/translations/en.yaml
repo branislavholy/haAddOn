@@ -11,3 +11,9 @@ configuration:
   password:
     name: "MQTT Password"
     description: "Password for the MQTT service API."
+  port:
+    name: "MQTT Port"
+    description: "Port for the MQTT service API."
+  hostname:
+    name: "MQTT Host"
+    description: "Hostname for the MQTT service API."

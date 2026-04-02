@@ -13,10 +13,14 @@ ports:
 options:
   language: en
   uof: metric
-  username: ''
+  hostname: ''
+  port: 1883
+  username: 'branislav'
   password: ''
 schema:
   language: list(en|sk)
   uof: list(metric|imperial)
+  hostname: str
+  port: int
   username: str
   password: password
