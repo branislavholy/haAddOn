@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/branislavholy/haAddOn/compare/v1.3.3...v1.3.4) (2026-04-02)
+
+
+### Bug Fixes
+
+* update create release ([c872d94](https://github.com/branislavholy/haAddOn/commit/c872d94d7efef902358f04b600e918e62e9a9a2c))
+
 ## [1.3.3](https://github.com/branislavholy/haAddOn/compare/v1.3.2...v1.3.3) (2026-04-02)
 
 
