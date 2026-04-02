@@ -754,12 +754,12 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 		key = strings.TrimSpace(key)
 		value = strings.TrimSpace(value)
 
-		log.Printf("Processing - key=%s, value=%s", key, value)
+		// log.Printf("Processing - key=%s, value=%s", key, value)
 		// log.Printf("UnitOfMeasurement=%s", config.UnitOfMeasurement)
 		// log.Printf("Language=%s", config.Language)
 
 		status, deviceCl, unitOfMesure, localizedName, convertedValue, measurement := transformInput(key, value, config)
-		log.Printf("Processing end - key=%s, value=%s", key, value)
+		// log.Printf("Processing end - key=%s, value=%s", key, value)
 
 		// log.Printf("Sensor config: status=%s, class=%s, unit=%s, name=%s, converted=%s", status, deviceCl, unitOfMesure, localizedName, convertedValue)
 		data[key] = convertedValue
