@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/branislavholy/haAddOn/compare/v1.3.0...v1.3.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* weather configs ([4c52e9a](https://github.com/branislavholy/haAddOn/commit/4c52e9ac67381283f15ca463e74d7442e7562893))
+* weather configs ([536ddab](https://github.com/branislavholy/haAddOn/commit/536ddabf17f60da3be2a062ba950c046ba0ecea0))
+
 ## [1.3.0](https://github.com/branislavholy/haAddOn/compare/v1.2.5...v1.3.0) (2026-04-02)
 
 
