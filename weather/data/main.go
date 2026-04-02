@@ -367,10 +367,10 @@ func convertToMetric(key, value string) string {
 	// Parse value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		log.Printf("WARN: Failed to parse value %q for key %q, using original", value, key)
+		// log.Printf("WARN: Failed to parse value %q for key %q, using original", value, key)
 		return value
 	}
-	log.Printf("INFO: Parsed value %q for key %q, using original", value, key)
+	// log.Printf("INFO: Parsed value %q for key %q, using original", value, key)
 
 	var converted float64
 	switch key {
@@ -392,7 +392,7 @@ func convertToMetric(key, value string) string {
 		// No conversion needed
 		return value
 	}
-	log.Printf("INFO: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
+	// log.Printf("INFO: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
 	// Format back to string with 2 decimal places
 	return strconv.FormatFloat(converted, 'f', 2, 64)
 }
@@ -411,12 +411,12 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	case "imperial":
 		selectedUnits = unitsImperial
 		convertedValue = value
-		log.Printf("DEBUG: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
+		// log.Printf("DEBUG: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
 	case "metric":
 		selectedUnits = unitsMetric
 		// Convert value from imperial to metric
 		convertedValue = convertToMetric(normalizedKey, value)
-		log.Printf("DEBUG: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
+		// log.Printf("DEBUG: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
 	default:
 		log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
 		// selectedUnits = unitsImperial
@@ -426,8 +426,8 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	// Look up sensor in the selected unit system map
 	if sensorConfig, exists := selectedUnits[normalizedKey]; exists {
 		// Get localized name from unitsName map
-		log.Printf("DEBUG: Found sensor mapping - key=%q, value=%q, system=%q -> class=%q, unit=%q, name=%q",
-			key, convertedValue, normalizedUnitsType, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName)
+		// log.Printf("DEBUG: Found sensor mapping - key=%q, value=%q, system=%q -> class=%q, unit=%q, name=%q",
+		// 	key, convertedValue, normalizedUnitsType, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName)
 		return sensorConfig.Status, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName, convertedValue, sensorConfig.Measurement
 	}
 
@@ -755,12 +755,12 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 		value = strings.TrimSpace(value)
 
 		log.Printf("Processing - key=%s, value=%s", key, value)
-		log.Printf("UnitOfMeasurement=%s", config.UnitOfMeasurement)
-		log.Printf("Language=%s", config.Language)
+		// log.Printf("UnitOfMeasurement=%s", config.UnitOfMeasurement)
+		// log.Printf("Language=%s", config.Language)
 
 		status, deviceCl, unitOfMesure, localizedName, convertedValue, measurement := transformInput(key, value, config)
 
-		log.Printf("Sensor config: status=%s, class=%s, unit=%s, name=%s, converted=%s", status, deviceCl, unitOfMesure, localizedName, convertedValue)
+		// log.Printf("Sensor config: status=%s, class=%s, unit=%s, name=%s, converted=%s", status, deviceCl, unitOfMesure, localizedName, convertedValue)
 		data[key] = convertedValue
 		// var deviceCl string
 		// var unitOfMesure string
