@@ -9,7 +9,7 @@ arch:
   - aarch64
 startup: services
 ports:
-  8000/tcp: 8000
+  80/tcp: 80
 options:
   language: en
   uof: metric

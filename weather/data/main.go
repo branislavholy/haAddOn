@@ -650,12 +650,12 @@ func main() {
 	mux := http.NewServeMux()
 	// Wrap handleData with config using a closure
 	// mux.HandleFunc("/weatherstation/updateweatherstation2.php", handleData)
-	mux.HandleFunc("/weatherstation/updateweatherstation2.php", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/weatherstation/updateweatherstation.php", func(w http.ResponseWriter, r *http.Request) {
 		handleData(w, r, config)
 	})
 
 	server := &http.Server{
-		Addr:              ":8000",
+		Addr:              ":80",
 		Handler:           mux,
 		ReadHeaderTimeout: 5 * time.Second,  // Protects against Slowloris attacks
 		ReadTimeout:       15 * time.Second, // Time to read request body
@@ -759,6 +759,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 		// log.Printf("Language=%s", config.Language)
 
 		status, deviceCl, unitOfMesure, localizedName, convertedValue, measurement := transformInput(key, value, config)
+		log.Printf("Processing end - key=%s, value=%s", key, value)
 
 		// log.Printf("Sensor config: status=%s, class=%s, unit=%s, name=%s, converted=%s", status, deviceCl, unitOfMesure, localizedName, convertedValue)
 		data[key] = convertedValue
