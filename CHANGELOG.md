@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/branislavholy/haAddOn/compare/v1.4.0...v1.4.1) (2026-04-02)
+
+
+### Bug Fixes
+
+* weather update port ([6a208f6](https://github.com/branislavholy/haAddOn/commit/6a208f650573576f254f9e39c92633661e360c6a))
+
 ## [1.4.0](https://github.com/branislavholy/haAddOn/compare/v1.3.4...v1.4.0) (2026-04-02)
 
 
