@@ -80,13 +80,7 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-  groups:
-    - title: 'Dependency Updates'
-      regexp: "^.*(chore|deps).*$"
-      order: 1
-    - title: 'Weather tool'
-      regexp: "^.*weather.*$"
-      order: 2
+
 
 # A footer to add to all releases.
 release:
@@ -95,9 +89,3 @@ release:
     ---
 
     Released by [GoReleaser](https://github.com/goreleaser/goreleaser).
-
-publishers:
-  - name: "generate-weather-changelog"
-    ids:
-      - weather_build
-    cmd: sh -c "echo '{{ .Changelog }}' > ./weather/CHANGELOG.md"
