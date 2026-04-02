@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.0](https://github.com/branislavholy/haAddOn/compare/v1.2.5...v1.3.0) (2026-04-02)
+
+
+### Features
+
+* update weather main go ([629bec3](https://github.com/branislavholy/haAddOn/commit/629bec3bfe35563a2a47175ef248395cd60fc4f4))
+
 ## [1.2.5](https://github.com/branislavholy/haAddOn/compare/v1.2.4...v1.2.5) (2026-04-01)
 
 
