@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.2](https://github.com/branislavholy/haAddOn/compare/v1.4.1...v1.4.2) (2026-04-02)
+
+
+### Bug Fixes
+
+* **weather:** repare hostname config ([68cfb10](https://github.com/branislavholy/haAddOn/commit/68cfb10ecb81406ff8d9e88e9547a5ef28ba1384))
+
 ## [1.4.1](https://github.com/branislavholy/haAddOn/compare/v1.4.0...v1.4.1) (2026-04-02)
 
 
