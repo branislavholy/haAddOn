@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.19](https://github.com/branislavholy/haAddOn/compare/v1.4.18...v1.4.19) (2026-04-08)
+
+
+### Bug Fixes
+
+* update load client ([9acd713](https://github.com/branislavholy/haAddOn/commit/9acd7139d21f0917cad69e3ec627a66eae2ee173))
+
 ## [1.4.18](https://github.com/branislavholy/haAddOn/compare/v1.4.17...v1.4.18) (2026-04-08)
 
 
