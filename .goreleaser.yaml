@@ -88,15 +88,15 @@ changelog:
     exclude:
       - "^docs:"
       - "^test:"
-  paths:
-    - weather/
+  # paths:
+  #   - weather/
 
 # A footer to add to all releases.
 release:
   # draft: false             # Tells GoReleaser to publish the final result
   # use_existing_draft: true # Important: picks up the draft from release-please
-  draft: false
-  mode: keep-existing
+  # draft: false
+  # mode: keep-existing
   footer: >-
 
     ---
