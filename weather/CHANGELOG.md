@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.13](https://github.com/branislavholy/haAddOn/compare/v1.4.12...v1.4.13) (2026-04-08)
+
+
+### Bug Fixes
+
+* **weather:** change input options ([2744977](https://github.com/branislavholy/haAddOn/commit/27449775e2c509bcbc081df481c41ae3d5a135a9))
+
 ## [1.4.12](https://github.com/branislavholy/haAddOn/compare/v1.4.11...v1.4.12) (2026-04-08)
 
 
