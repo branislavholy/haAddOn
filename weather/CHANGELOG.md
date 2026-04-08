@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.17](https://github.com/branislavholy/haAddOn/compare/v1.4.16...v1.4.17) (2026-04-08)
+
+
+### Bug Fixes
+
+* update log in run.sh ([1566be7](https://github.com/branislavholy/haAddOn/commit/1566be717704352a032ea7e59d22d361a25ec076))
+
 ## [1.4.16](https://github.com/branislavholy/haAddOn/compare/v1.4.15...v1.4.16) (2026-04-08)
 
 
