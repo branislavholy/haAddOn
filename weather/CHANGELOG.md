@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.12](https://github.com/branislavholy/haAddOn/compare/v1.4.11...v1.4.12) (2026-04-08)
+
+
+### Bug Fixes
+
+* **weather:** add log variable ([4ef76d4](https://github.com/branislavholy/haAddOn/commit/4ef76d4705b382031b25f01e3f8be72e2015947f))
+
 ## [1.4.11](https://github.com/branislavholy/haAddOn/compare/v1.4.10...v1.4.11) (2026-04-08)
 
 
