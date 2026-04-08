@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.18](https://github.com/branislavholy/haAddOn/compare/v1.4.17...v1.4.18) (2026-04-08)
+
+
+### Bug Fixes
+
+* update weather logging ([22a8314](https://github.com/branislavholy/haAddOn/commit/22a8314b655adf7d4404d15b08a3859ca14076c9))
+
 ## [1.4.17](https://github.com/branislavholy/haAddOn/compare/v1.4.16...v1.4.17) (2026-04-08)
 
 
