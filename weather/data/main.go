@@ -19,8 +19,11 @@ import (
 )
 
 const (
-	clientID = "go-mqtt-subscriber"
-	topic    = "homeassistant/sensor/weather/state"
+	clientID   = "go-mqtt-subscriber"
+	topic      = "homeassistant/sensor/weather/state"
+	ColorReset = "\033[0m"
+	ColorCyan  = "\033[36m" // DEBUG
+	ColorGreen = "\033[32m" // INFO
 )
 
 var mqttMsgChan = make(chan mqtt.Message)
@@ -170,8 +173,22 @@ var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err
 }
 
 func myLog(level string, msg string, payload any) {
+	// timestamp := time.Now().Format("2006-01-02 15:04:05")
+	// fmt.Printf("[%s] %s: \t%s '%s'\n", timestamp, level, msg, payload)
+	var color string
+	// timestamp := time.Now().Format("15:04:05")
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
-	fmt.Printf("[%s] %s: \t%s '%s'\n", timestamp, level, msg, payload)
+
+	switch level {
+	case "DEBUG":
+		color = ColorCyan
+	case "INFO":
+		color = ColorGreen
+	default:
+		color = ColorReset
+	}
+
+	fmt.Printf("%s[%s] %s: %s '%s'%s\n", color, timestamp, level, msg, payload, ColorReset)
 }
 
 // SensorConfig defines device class and unit of measurement for a sensor
