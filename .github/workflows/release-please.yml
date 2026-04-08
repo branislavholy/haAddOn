@@ -19,7 +19,7 @@ jobs:
         id: release
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-          # draft: true
+          draft: true
           release-type: go
 
   goreleaser:
@@ -46,7 +46,7 @@ jobs:
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v7
         with:
-          # distribution: goreleaser
+          distribution: goreleaser
           # version: latest
           version: "~> v2"
           args: release --clean ${{ env.flags }}

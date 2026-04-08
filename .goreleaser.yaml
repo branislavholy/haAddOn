@@ -86,6 +86,7 @@ changelog:
 release:
   # draft: false             # Tells GoReleaser to publish the final result
   # use_existing_draft: true # Important: picks up the draft from release-please
+  mode: keep-existing
   footer: >-
 
     ---
