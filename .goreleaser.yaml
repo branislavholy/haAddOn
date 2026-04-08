@@ -78,10 +78,10 @@ changelog:
   use: git
   groups:
     - title: Weather Bug Fixes
-      regexp: "^fix\\(weather\\):.*"
+      regexp: "^fix\\((weather|)\\):.*"
       order: 1
     - title: Weather Features
-      regexp: "^feat\\(weather\\):.*"
+      regexp: "^feat\\((weather|)\\):.*"
       order: 2
   sort: asc
   filters:

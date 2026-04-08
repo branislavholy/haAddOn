@@ -7,13 +7,13 @@ configuration:
     description: "Controls the language of the units of measurement for the app."
   username:
     name: "MQTT Username"
-    description: "Username for the MQTT service API."
+    description: "The username for the MQTT service API."
   password:
     name: "MQTT Password"
-    description: "Password for the MQTT service API."
+    description: "The password for the MQTT service API."
   port:
     name: "MQTT Port"
-    description: "Port for the MQTT service API."
+    description: " The port for the MQTT service API."
   hostname:
     name: "MQTT Host"
-    description: "Hostname for the MQTT service API."
+    description: "The hostname for the MQTT service API. If left empty, the default Home Assistant hostname will be used."
