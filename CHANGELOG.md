@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.8](https://github.com/branislavholy/haAddOn/compare/v1.4.7...v1.4.8) (2026-04-08)
+
+
+### Bug Fixes
+
+* **weather:** init changelog ([3326f4e](https://github.com/branislavholy/haAddOn/commit/3326f4e1e526e0697dcc25cfa7ad00756bc623b6))
+
 ## [1.4.7](https://github.com/branislavholy/haAddOn/compare/v1.4.6...v1.4.7) (2026-04-08)
 
 
