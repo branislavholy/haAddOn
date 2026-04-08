@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.15](https://github.com/branislavholy/haAddOn/compare/v1.4.14...v1.4.15) (2026-04-08)
+
+
+### Bug Fixes
+
+* **weather:** update weather option ([cb438c0](https://github.com/branislavholy/haAddOn/commit/cb438c0e73f420c91b87eee244074ce697f5d989))
+
 ## [1.4.14](https://github.com/branislavholy/haAddOn/compare/v1.4.13...v1.4.14) (2026-04-08)
 
 
