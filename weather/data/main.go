@@ -665,11 +665,47 @@ func main() {
 	myLog("Info", "Build commit: ", commit)
 	myLog("Info", "Build date:   ", date)
 
+	opts := mqtt.NewClientOptions()
+
+	// Now you can initialize your MQTT client
+	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
+	fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
+
+	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
+	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
+	opts.SetUsername(config.MQTT.Username)
+	opts.SetPassword(config.MQTT.Password)
+	opts.AddBroker(broker)
+	opts.SetClientID(clientID)
+	opts.SetDefaultPublishHandler(messagePubHandler)
+
+	opts.SetKeepAlive(30 * time.Second)
+	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
+		log.Printf("TOPIC: %s\n", msg.Topic())
+		log.Printf("MSG: %s\n", msg.Payload())
+	})
+
+	opts.SetPingTimeout(1 * time.Second)
+	opts.SetAutoReconnect(true)
+	opts.SetMaxReconnectInterval(10 * time.Second)
+	opts.SetConnectRetry(true)
+	opts.SetConnectRetryInterval(10 * time.Second)
+	opts.SetWriteTimeout(60 * time.Second)
+
+	opts.OnConnect = connectHandler
+	opts.OnConnectionLost = connectLostHandler
+
+	client := mqtt.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		myLog("Info", "MQTT:", token.Error())
+	}
+	defer client.Disconnect(250)
+
 	mux := http.NewServeMux()
 	// Wrap handleData with config using a closure
 	// mux.HandleFunc("/weatherstation/updateweatherstation2.php", handleData)
 	mux.HandleFunc("/weatherstation/updateweatherstation.php", func(w http.ResponseWriter, r *http.Request) {
-		handleData(w, r, config)
+		handleData(w, r, config, client)
 	})
 
 	server := &http.Server{
@@ -720,7 +756,7 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 	fmt.Println("--All sensors registered successfully in parallel!")
 }
 
-func handleData(w http.ResponseWriter, r *http.Request, config Config) {
+func handleData(w http.ResponseWriter, r *http.Request, config Config, mqttClient mqtt.Client) {
 	var sensors []HomeAssistantConfig
 
 	// Fill the default values for HomeAssistant Origin MQTT config
@@ -827,46 +863,46 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config) {
 	// // fmt.Println(string(payload))
 	// fmt.Printf("..Published: %s\n", payload)
 
-	opts := mqtt.NewClientOptions()
+	// opts := mqtt.NewClientOptions()
 
-	// Now you can initialize your MQTT client
-	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-	fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
+	// // Now you can initialize your MQTT client
+	// broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
+	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
 
-	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
-	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
-	opts.SetUsername(config.MQTT.Username)
-	opts.SetPassword(config.MQTT.Password)
-	opts.AddBroker(broker)
-	opts.SetClientID(clientID)
-	opts.SetDefaultPublishHandler(messagePubHandler)
+	// // opts.SetUsername(os.Getenv("MQTT_USERNAME"))
+	// // opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
+	// opts.SetUsername(config.MQTT.Username)
+	// opts.SetPassword(config.MQTT.Password)
+	// opts.AddBroker(broker)
+	// opts.SetClientID(clientID)
+	// opts.SetDefaultPublishHandler(messagePubHandler)
 
-	opts.SetKeepAlive(30 * time.Second)
-	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		log.Printf("TOPIC: %s\n", msg.Topic())
-		log.Printf("MSG: %s\n", msg.Payload())
-	})
+	// opts.SetKeepAlive(30 * time.Second)
+	// opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
+	// 	log.Printf("TOPIC: %s\n", msg.Topic())
+	// 	log.Printf("MSG: %s\n", msg.Payload())
+	// })
 
-	opts.SetPingTimeout(1 * time.Second)
-	opts.SetAutoReconnect(true)
-	opts.SetMaxReconnectInterval(10 * time.Second)
-	opts.SetConnectRetry(true)
-	opts.SetConnectRetryInterval(10 * time.Second)
-	opts.SetWriteTimeout(60 * time.Second)
+	// opts.SetPingTimeout(1 * time.Second)
+	// opts.SetAutoReconnect(true)
+	// opts.SetMaxReconnectInterval(10 * time.Second)
+	// opts.SetConnectRetry(true)
+	// opts.SetConnectRetryInterval(10 * time.Second)
+	// opts.SetWriteTimeout(60 * time.Second)
 
-	opts.OnConnect = connectHandler
-	opts.OnConnectionLost = connectLostHandler
+	// opts.OnConnect = connectHandler
+	// opts.OnConnectionLost = connectLostHandler
 
-	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		myLog("Info", "MQTT:", token.Error())
-	}
-	defer client.Disconnect(250)
+	// client := mqtt.NewClient(opts)
+	// if token := client.Connect(); token.Wait() && token.Error() != nil {
+	// 	myLog("Info", "MQTT:", token.Error())
+	// }
+	// defer client.Disconnect(250)
 
-	registerSensors(client, sensors)
+	registerSensors(mqttClient, sensors)
 
-	client.Publish(topic, 1, true, jsonData).Wait()
+	mqttClient.Publish(topic, 1, true, jsonData).Wait()
 	// fmt.Printf("..Published State: %s\n", jsonData)
 
-	client.Disconnect(250)
+	mqttClient.Disconnect(250)
 }
