@@ -5,7 +5,7 @@
 
 ### Bug Fixes
 
-* update client reqister ([5b17a72](https://github.com/branislavholy/haAddOn/commit/5b17a7201d98c3de8123a09f13fbbdd157db5aa5))
+* update client register ([5b17a72](https://github.com/branislavholy/haAddOn/commit/5b17a7201d98c3de8123a09f13fbbdd157db5aa5))
 
 ## [1.4.19](https://github.com/branislavholy/haAddOn/compare/v1.4.18...v1.4.19) (2026-04-08)
 
