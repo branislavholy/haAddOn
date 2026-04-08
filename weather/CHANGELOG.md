@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.14](https://github.com/branislavholy/haAddOn/compare/v1.4.13...v1.4.14) (2026-04-08)
+
+
+### Bug Fixes
+
+* **weather:** change app option ([14b0c7e](https://github.com/branislavholy/haAddOn/commit/14b0c7e092b71fe176be17ae2e6ed1c1b5c83e27))
+
 ## [1.4.13](https://github.com/branislavholy/haAddOn/compare/v1.4.12...v1.4.13) (2026-04-08)
 
 
