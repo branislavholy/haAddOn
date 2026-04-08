@@ -15,6 +15,7 @@ export LOG_LEVEL=${LOG_LEVEL^^}
 bashio::log.info "Starting weather service with log level: '$LOG_LEVEL'"
 
 if [ "$LOG_LEVEL" = "DEBUG" ]; then
+  export __BASHIO_LOG_LEVEL=7
   bashio::log.warning "Loaded hostname: '$MQTT_HOSTNAME'"
   bashio::log.debug "Loaded hostname: '$MQTT_HOSTNAME'"
   bashio::log.debug "Loaded language: '$HA_LANGUAGE'"
