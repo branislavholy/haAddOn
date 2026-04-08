@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.21](https://github.com/branislavholy/haAddOn/compare/v1.4.20...v1.4.21) (2026-04-08)
+
+
+### Bug Fixes
+
+* get back client ([208d6d3](https://github.com/branislavholy/haAddOn/commit/208d6d38c1b0f3bfb93c8f7f01c130913a06ee02))
+
 ## [1.4.20](https://github.com/branislavholy/haAddOn/compare/v1.4.19...v1.4.20) (2026-04-08)
 
 
