@@ -8,9 +8,9 @@
       "draft": false,
       "prerelease": false,
       "extra-files": [
-        "weather/Dockerfile",
-        "weather/config.yaml",
-        "weather/data/main.go",
+        "Dockerfile",
+        "config.yaml",
+        "data/main.go",
         "README.md"
       ]
     }

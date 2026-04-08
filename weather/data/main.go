@@ -271,7 +271,6 @@ var UnitsConfig = map[string]map[string]string{
 }
 
 // key=rtfreq, value=5
-
 // key=indoortempf, value=68
 // key=windgustmph, value=2
 // key=baromin, value=30
@@ -491,12 +490,12 @@ func loadConfig() Config {
 	// 	return defaultConfig
 	// }
 
-	// Override with environment variables if set
-	if envHost := os.Getenv("MQTT_HOSTNAME"); envHost != "" {
-		config.MQTT.Host = envHost
-	} else {
-		config.MQTT.Host = defaultConfig.MQTT.Host
-	}
+	// // Override with environment variables if set
+	// if envHost := os.Getenv("MQTT_HOSTNAME"); envHost != "" {
+	// 	config.MQTT.Host = envHost
+	// } else {
+	// 	config.MQTT.Host = defaultConfig.MQTT.Host
+	// }
 
 	if envPort := os.Getenv("MQTT_PORT"); envPort != "" {
 		if port, err := strconv.Atoi(envPort); err == nil {
