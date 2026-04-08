@@ -19,10 +19,10 @@ options:
   password: ''
   log_level: info
 schema:
-  hostname: str
   language: list(en|sk)
-  log_level: list(debug|info)
-  password: password
-  port: int
   uof: list(metric|imperial)
+  hostname: str
+  port: int
   username: str
+  password: password
+  log_level: list(debug|info|error)

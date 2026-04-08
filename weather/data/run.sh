@@ -12,6 +12,8 @@ export MQTT_USERNAME=${MQTT_USERNAME:-$(bashio::config 'username')}
 LOG_LEVEL=${LOG_LEVEL:-$(bashio::config 'log_level')}
 export LOG_LEVEL=${LOG_LEVEL^^}
 
+bashio::log.info "Starting weather service with log level: '$LOG_LEVEL'"
+
 if [ "$LOG_LEVEL" = "DEBUG" ]; then
   bashio::log.debug "Loaded hostname: '$MQTT_HOSTNAME'"
   bashio::log.debug "Loaded language: '$HA_LANGUAGE'"
