@@ -21,8 +21,8 @@ options:
 schema:
   language: list(en|sk)
   uof: list(metric|imperial)
-  hostname: str
-  port: int
+  hostname: "str?"
+  port: "int?"
   username: str
   password: password
   log_level: list(debug|info|error)
