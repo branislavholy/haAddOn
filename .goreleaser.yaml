@@ -75,14 +75,6 @@ checksum:
 
 # Changelog configuration (will be in the github release).
 changelog:
-  use: git
-  groups:
-    - title: Weather Bug Fixes
-      regexp: "^fix\\((weather|)\\):.*"
-      order: 1
-    - title: Weather Features
-      regexp: "^feat\\((weather|)\\):.*"
-      order: 2
   sort: asc
   filters:
     exclude:

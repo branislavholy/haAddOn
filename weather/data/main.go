@@ -271,6 +271,7 @@ var UnitsConfig = map[string]map[string]string{
 }
 
 // key=rtfreq, value=5
+
 // key=indoortempf, value=68
 // key=windgustmph, value=2
 // key=baromin, value=30
