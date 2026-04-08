@@ -75,17 +75,27 @@ checksum:
 
 # Changelog configuration (will be in the github release).
 changelog:
+  use: git
+  groups:
+    - title: Weather Bug Fixes
+      regexp: "^fix\\(weather\\):.*"
+      order: 1
+    - title: Weather Features
+      regexp: "^feat\\(weather\\):.*"
+      order: 2
   sort: asc
   filters:
     exclude:
       - "^docs:"
       - "^test:"
-
+  paths:
+    - weather/
 
 # A footer to add to all releases.
 release:
   # draft: false             # Tells GoReleaser to publish the final result
   # use_existing_draft: true # Important: picks up the draft from release-please
+  draft: false
   mode: keep-existing
   footer: >-
 
