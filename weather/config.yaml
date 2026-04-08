@@ -17,10 +17,12 @@ options:
   port: 1883
   username: branislav
   password: ''
+  log_level: info
 schema:
-  language: list(en|sk)
-  uof: list(metric|imperial)
   hostname: str
-  port: int
-  username: str
+  language: list(en|sk)
+  log_level: list(debug|info)
   password: password
+  port: int
+  uof: list(metric|imperial)
+  username: str
