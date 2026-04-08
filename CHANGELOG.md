@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.6](https://github.com/branislavholy/haAddOn/compare/v1.4.5...v1.4.6) (2026-04-08)
+
+
+### Bug Fixes
+
+* update MQTT default host and port ([086052e](https://github.com/branislavholy/haAddOn/commit/086052e6c8e24146cfc03aad0f5066338268a612))
+* update release please ([1e7b8b0](https://github.com/branislavholy/haAddOn/commit/1e7b8b05006514d98df1c3c85ca2ff2dafb0dedb))
+
 ## [1.4.5](https://github.com/branislavholy/haAddOn/compare/v1.4.4...v1.4.5) (2026-04-08)
 
 
