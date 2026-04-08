@@ -1,7 +1,7 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
-ARG RELEASE_TAG="1.4.19" # x-release-please-version
+ARG RELEASE_TAG="1.4.20" # x-release-please-version
 ARG TARGETOS
 # ARG TARGETARCH
 
