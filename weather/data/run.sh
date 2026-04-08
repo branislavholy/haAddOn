@@ -13,9 +13,9 @@ LOG_LEVEL=${LOG_LEVEL:-$(bashio::config 'log_level')}
 export LOG_LEVEL=${LOG_LEVEL^^}
 
 bashio::log.info "Starting weather service with log level: '$LOG_LEVEL'"
-bashio::log.warning "Loaded hostname: '$MQTT_HOSTNAME'"
 
 if [ "$LOG_LEVEL" = "DEBUG" ]; then
+  bashio::log.warning "Loaded hostname: '$MQTT_HOSTNAME'"
   bashio::log.debug "Loaded hostname: '$MQTT_HOSTNAME'"
   bashio::log.debug "Loaded language: '$HA_LANGUAGE'"
   bashio::log.debug "Loaded port:     '$MQTT_PORT'"
