@@ -21,9 +21,9 @@ const (
 	clientID    = "go-mqtt-subscriber"
 	topic       = "homeassistant/sensor/weather/state"
 	ColorReset  = "\033[0m"
-	ColorCyan   = "\033[36m" // DEBUG
-	ColorGreen  = "\033[32m" // INFO
-	ColorYellow = "\033[33m" // WARN
+	ColorCyan   = "\033[36m" // Debug
+	ColorGreen  = "\033[32m" // Info
+	ColorYellow = "\033[33m" // Warning
 )
 
 // Global map for safely tracking registered topics
@@ -193,6 +193,7 @@ func getLevelPriority(level string) int {
 		return 2 // Default to INFO
 	}
 }
+
 func customLog(level string, format string, v ...any) {
 	// timestamp := time.Now().Format("2006-01-02 15:04:05")
 	// fmt.Printf("[%s] %s: \t%s '%s'\n", timestamp, level, msg, payload)
@@ -205,11 +206,11 @@ func customLog(level string, format string, v ...any) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
 	switch level {
-	case "DEBUG":
+	case "Debug":
 		color = ColorCyan
-	case "INFO":
+	case "Info":
 		color = ColorGreen
-	case "WARN":
+	case "Warning":
 		color = ColorYellow
 	default:
 		color = ColorReset
@@ -414,10 +415,10 @@ func convertToMetric(key, value string) string {
 	// Parse value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		// log.Printf("WARN: Failed to parse value %q for key %q, using original", value, key)
+		// log.Printf("Warning: Failed to parse value %q for key %q, using original", value, key)
 		return value
 	}
-	// log.Printf("INFO: Parsed value %q for key %q, using original", value, key)
+	// log.Printf("Info: Parsed value %q for key %q, using original", value, key)
 
 	var converted float64
 	switch key {
@@ -439,7 +440,7 @@ func convertToMetric(key, value string) string {
 		// No conversion needed
 		return value
 	}
-	// log.Printf("INFO: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
+	// log.Printf("Info: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
 	// Format back to string with 2 decimal places
 	return strconv.FormatFloat(converted, 'f', 2, 64)
 }
@@ -458,15 +459,15 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	case "imperial":
 		selectedUnits = unitsImperial
 		convertedValue = value
-		// log.Printf("DEBUG: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
+		// log.Printf("Debug: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
 	case "metric":
 		selectedUnits = unitsMetric
 		// Convert value from imperial to metric
 		convertedValue = convertToMetric(normalizedKey, value)
-		// log.Printf("DEBUG: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
+		// log.Printf("Debug: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
 	default:
-		// log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
-		customLog("WARN", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
+		// log.Printf("Warning: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
+		customLog("Warning", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
 		// selectedUnits = unitsImperial
 		return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
 	}
@@ -474,7 +475,7 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	// Look up sensor in the selected unit system map
 	if sensorConfig, exists := selectedUnits[normalizedKey]; exists {
 		// Get localized name from unitsName map
-		// log.Printf("DEBUG: Found sensor mapping - key=%q, value=%q, system=%q -> class=%q, unit=%q, name=%q",
+		// log.Printf("Debug: Found sensor mapping - key=%q, value=%q, system=%q -> class=%q, unit=%q, name=%q",
 		// 	key, convertedValue, normalizedUnitsType, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName)
 		return sensorConfig.Status, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName, convertedValue, sensorConfig.Measurement
 	}
@@ -525,7 +526,7 @@ func loadConfig() Config {
 	// file, err := os.ReadFile(configPath)
 	// if err != nil {
 	// 	if os.IsNotExist(err) {
-	// 		log.Printf("WARN: Config file not found at %s, using defaults", configPath)
+	// 		log.Printf("Warning: Config file not found at %s, using defaults", configPath)
 	// 	} else {
 	// 		log.Printf("ERROR: Failed to read config file: %v, using defaults", err)
 	// 	}
@@ -612,8 +613,8 @@ func calculateWinDir(windDir string) string {
 	// Normalize wind direction to 0-360 range
 	val, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		// log.Printf("WARN: Failed to parse wind direction %q, using original", windDir)
-		customLog("WARN", "Failed to parse wind direction %q, using original", windDir)
+		// log.Printf("Warning: Failed to parse wind direction %q, using original", windDir)
+		customLog("Warning", "Failed to parse wind direction %q, using original", windDir)
 		return windDir
 	}
 
@@ -634,8 +635,8 @@ func calculateWindDirSite(windDir string) string {
 	// Parse wind direction to float64
 	value, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		// log.Printf("WARN: Failed to parse wind direction %q, using N|S", windDir)
-		customLog("WARN", "Failed to parse wind direction %q, using N|S", windDir)
+		// log.Printf("Warning: Failed to parse wind direction %q, using N|S", windDir)
+		customLog("Warning", "Failed to parse wind direction %q, using N|S", windDir)
 		return "N|S"
 	}
 
@@ -838,15 +839,15 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte("success")); err != nil {
-		customLog("WARN", "Failed to write response to station: %v", err)
+		customLog("Warning", "Failed to write response to station: %v", err)
 	}
 
 	for key, values := range r.Form {
 		for _, val := range values {
 			// Skip empty entries
 			if key == "" || val == "" {
-				// log.Printf("WARN: Skipping empty key or value - key=%q, value=%q", key, val)
-				customLog("WARN", "Skipping empty key or value - key=%q, value=%q", key, val)
+				// log.Printf("Warning: Skipping empty key or value - key=%q, value=%q", key, val)
+				customLog("Warning", "Skipping empty key or value - key=%q, value=%q", key, val)
 				continue
 			}
 			data[key] = val
