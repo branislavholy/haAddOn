@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"math"
 	"net/http"
 	"os"
@@ -168,14 +167,16 @@ func GetDeviceModelInfo(input string) (string, string) {
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	fmt.Println("Connected to MQTT Broker")
+	// fmt.Println("Connected to MQTT Broker")
+	customLog("Info", "Connected to MQTT Broker")
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	fmt.Printf("Connection lost: %v", err)
+	// fmt.Printf("Connection lost: %v", err)
+	customLog("Error", "Connection lost: %v", err)
 }
 
-func myLog(level string, msg string, payload any) {
+func customLog(level string, format string, v ...any) {
 	// timestamp := time.Now().Format("2006-01-02 15:04:05")
 	// fmt.Printf("[%s] %s: \t%s '%s'\n", timestamp, level, msg, payload)
 	var color string
@@ -191,7 +192,10 @@ func myLog(level string, msg string, payload any) {
 		color = ColorReset
 	}
 
-	fmt.Printf("%s[%s] %s: %s '%s'%s\n", color, timestamp, level, msg, payload, ColorReset)
+	// Use Sprintf to combine the format string with the variables
+	msg := fmt.Sprintf(format, v...)
+	// fmt.Printf("%s[%s] %s: %s '%s'%s\n", color, timestamp, level, msg, payload, ColorReset)
+	fmt.Printf("%s[%s] %s: %s%s\n", color, timestamp, level, msg, ColorReset)
 }
 
 // SensorConfig defines device class and unit of measurement for a sensor
@@ -438,7 +442,8 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 		convertedValue = convertToMetric(normalizedKey, value)
 		// log.Printf("DEBUG: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
 	default:
-		log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
+		// log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
+		customLog("WARN", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
 		// selectedUnits = unitsImperial
 		return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
 	}
@@ -452,7 +457,8 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	}
 
 	// Log warning for unknown sensor types
-	log.Printf("WARN: Unknown sensor type - key=%q (in %q system), using default mapping", key, normalizedUnitsType)
+	customLog("WARN", "Unknown sensor type - key=%q (in %q system), using default mapping", key, normalizedUnitsType)
+
 	return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
 }
 
@@ -523,7 +529,8 @@ func loadConfig() Config {
 		if port, err := strconv.Atoi(envPort); err == nil {
 			config.MQTT.Port = port
 		} else {
-			log.Printf("ERROR: Failed to parse MQTT_PORT %q, using default", envPort)
+			// log.Printf("ERROR: Failed to parse MQTT_PORT %q, using default", envPort)
+			customLog("ERROR", "Failed to parse MQTT_PORT %q, using default", envPort)
 			config.MQTT.Port = defaultConfig.MQTT.Port
 		}
 	} else {
@@ -539,7 +546,7 @@ func loadConfig() Config {
 	if envPass := os.Getenv("MQTT_PASSWORD"); envPass != "" {
 		config.MQTT.Password = envPass
 	} else {
-		log.Printf("ERROR: MQTT_PASSWORD is not defined in environment variables")
+		customLog("ERROR", "MQTT_PASSWORD is not defined in environment variables")
 		// os.Exit(1)
 	}
 
@@ -563,10 +570,9 @@ func loadConfig() Config {
 		config.Language = defaultConfig.Language
 	}
 
-	log.Printf("INFO: Load variable host: '%s'", config.MQTT.Host)
-	log.Printf("INFO: Load variable port: '%d'", config.MQTT.Port)
-	log.Printf("INFO: Load variable username: '%s'", config.MQTT.Username)
-	// log.Printf("INFO: Config loaded successfully from %s", configPath)
+	customLog("Info", "Load variable host: '%q'", config.MQTT.Host)
+	customLog("Info", "Load variable port: '%d'", config.MQTT.Port)
+	customLog("Info", "Load variable username: '%q'", config.MQTT.Username)
 	return config
 }
 
@@ -585,7 +591,8 @@ func calculateWinDir(windDir string) string {
 	// Normalize wind direction to 0-360 range
 	val, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		log.Printf("WARN: Failed to parse wind direction %q, using original", windDir)
+		// log.Printf("WARN: Failed to parse wind direction %q, using original", windDir)
+		customLog("WARN", "Failed to parse wind direction %q, using original", windDir)
 		return windDir
 	}
 
@@ -606,7 +613,8 @@ func calculateWindDirSite(windDir string) string {
 	// Parse wind direction to float64
 	value, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		log.Printf("WARN: Failed to parse wind direction %q, using N|S", windDir)
+		// log.Printf("WARN: Failed to parse wind direction %q, using N|S", windDir)
+		customLog("WARN", "Failed to parse wind direction %q, using N|S", windDir)
 		return "N|S"
 	}
 
@@ -654,7 +662,8 @@ func mqttConnect(config Config) mqtt.Client {
 
 	// Now you can initialize your MQTT client
 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-	fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
+	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Usernames)
+	customLog("Info", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
 
 	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
 	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
@@ -666,8 +675,10 @@ func mqttConnect(config Config) mqtt.Client {
 
 	opts.SetKeepAlive(30 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		log.Printf("TOPIC: %s\n", msg.Topic())
-		log.Printf("MSG: %s\n", msg.Payload())
+		// log.Printf("TOPIC: %s\n", msg.Topic())
+		customLog("Info", "Topic: '%s'", msg.Topic())
+		// log.Printf("MSG: %s\n", msg.Payload())
+		customLog("Info", "Message: '%s'", msg.Payload())
 	})
 
 	opts.SetPingTimeout(1 * time.Second)
@@ -682,7 +693,7 @@ func mqttConnect(config Config) mqtt.Client {
 
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		myLog("Info", "MQTT:", token.Error())
+		customLog("Info", "MQTT: %v", token.Error())
 	}
 
 	return client
@@ -700,17 +711,17 @@ func main() {
 
 	// temperatureFahrenheit := u.NewValue(tempf, u.Fahrenheit)
 	// temperatureCelsius := temperatureFahrenheit.MustConvert(u.Celsius)
-	// myLog("Info", "temperatureCelsius:", strconv.FormatFloat(temperatureCelsius.Float(), 'f', 2, 64))
+	// customLog("Info", "temperatureCelsius:", strconv.FormatFloat(temperatureCelsius.Float(), 'f', 2, 64))
 
 	// windspeedkph := windspeedmph * 1.609344
-	// myLog("Info", "windspeedKilometerPerHour:", strconv.FormatFloat(windspeedkph, 'f', 2, 64))
+	// customLog("Info", "windspeedKilometerPerHour:", strconv.FormatFloat(windspeedkph, 'f', 2, 64))
 
 	client := mqttConnect(config)
 	defer client.Disconnect(250)
 
-	myLog("Info", "Build version:", version)
-	myLog("Info", "Build commit: ", commit)
-	myLog("Info", "Build date:   ", date)
+	customLog("Info", "Build version: '%q'", version)
+	customLog("Info", "Build commit: '%q'", commit)
+	customLog("Info", "Build date:   '%q'", date)
 
 	mux := http.NewServeMux()
 	// Wrap handleData with config using a closure
@@ -729,10 +740,10 @@ func main() {
 	}
 
 	// log.Printf("Starting server on %s", server.Addr)
-	myLog("Info", "Starting server on:", server.Addr)
+	customLog("Info", "Starting server on: '%q'", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
 		// log.Fatalf("Server failed: %s", err)
-		myLog("Error", "Server failed: ", err)
+		customLog("Error", "Server failed: %v", err)
 	}
 }
 
@@ -757,12 +768,14 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 			_, loaded := registeredTopics.LoadOrStore(topic, true)
 
 			if !loaded {
-				fmt.Printf("Register topic: %s\n", topic)
+				// fmt.Printf("Register topic: %s\n", topic)
+				customLog("Info", "Register topic: '%s'", topic)
 				// fmt.Printf("....Topic: %s\n", topic)
 				token := client.Publish(topic, 1, true, payload)
 
 				if token.Wait() && token.Error() != nil {
-					fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
+					// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
+					customLog("Error", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
 				}
 			}
 		}(itemSenzor)
@@ -770,7 +783,6 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 	// Wait for ALL goroutines to finish
 	wg.Wait()
-	fmt.Println("--All sensors registered successfully in parallel!")
 }
 
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
@@ -778,7 +790,8 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// Fill the default values for HomeAssistant Origin MQTT config
 	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
-	log.Printf("Default Origin: %+v", homeAssistantOrigin)
+	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
+	customLog("Info", "Default Origin: %+v", homeAssistantOrigin)
 
 	// Fill the default values for HomeAssistant Device MQTT config
 	homeAssistantDevice := FillDefaultHomeAssistantDevice()
@@ -787,19 +800,26 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	modelName, modelVersion := GetDeviceModelInfo(Id)
 	homeAssistantDevice.Model = strings.ToUpper(modelName)
 	homeAssistantDevice.HwVersion = modelVersion
-	log.Printf("Default Device: %+v", homeAssistantDevice)
+	// log.Printf("Default Device: %+v", homeAssistantDevice)
+	customLog("Info", "Default Device: %+v", homeAssistantDevice)
 
 	var data = make(map[string]string)
 	if err := r.ParseForm(); err != nil {
-		myLog("Error", "Message: ", err)
+		customLog("Error", "Message: %v", err)
 		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	if _, err := w.Write([]byte("success")); err != nil {
+		customLog("WARN", "Failed to write response to station: %v", err)
 	}
 
 	for key, values := range r.Form {
 		for _, val := range values {
 			// Skip empty entries
 			if key == "" || val == "" {
-				log.Printf("WARN: Skipping empty key or value - key=%q, value=%q", key, val)
+				// log.Printf("WARN: Skipping empty key or value - key=%q, value=%q", key, val)
+				customLog("WARN", "Skipping empty key or value - key=%q, value=%q", key, val)
 				continue
 			}
 			data[key] = val
@@ -810,14 +830,15 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	data["winddir"] = calculateWinDir(data["winddir"])
 	data["winddirsite"] = calculateWindDirSite(data["winddir"])
 
-	log.Printf("data: %s\n", data)
+	// log.Printf("data: %s\n", data)
+	customLog("Info", "Received data: %v", data)
 
 	jsonOriginalData, err := json.Marshal(data)
 	if err != nil {
-		myLog("Error", "Message: ", err)
+		customLog("Error", "Message: %v", err)
 		return
 	}
-	myLog("Debug", "Original data:", jsonOriginalData)
+	customLog("Debug", "Original data: %q", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
@@ -859,15 +880,15 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// jsonData, err := json.Marshal(convertedData)
 	// if err != nil {
-	// 	myLog("Error", "Message: ", err)
+	// 		("Error", "Message: ", err)
 	// 	return
 	// }
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		myLog("Error", "Message: ", err)
+		customLog("Error", "Message: %v", err)
 		return
 	}
-	myLog("Info", "Converted data:", jsonData)
+	customLog("Info", "Converted data: %q", jsonData)
 	// payload, err := json.MarshalIndent(sensors, "", "  ")
 
 	// Correct logging
@@ -912,7 +933,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// client := mqtt.NewClient(opts)
 	// if token := client.Connect(); token.Wait() && token.Error() != nil {
-	// 	myLog("Info", "MQTT:", token.Error())
+	// 	customLog("Info", "MQTT:", token.Error())
 	// }
 	// defer client.Disconnect(250)
 
