@@ -573,9 +573,9 @@ func loadConfig() Config {
 		config.Language = defaultConfig.Language
 	}
 
-	customLog("Info", "Load variable host: '%q'", config.MQTT.Host)
+	customLog("Info", "Load variable host: '%s'", config.MQTT.Host)
 	customLog("Info", "Load variable port: '%d'", config.MQTT.Port)
-	customLog("Info", "Load variable username: '%q'", config.MQTT.Username)
+	customLog("Info", "Load variable username: '%s'", config.MQTT.Username)
 	return config
 }
 
@@ -722,9 +722,9 @@ func main() {
 	client := mqttConnect(config)
 	defer client.Disconnect(250)
 
-	customLog("Info", "Build version: '%q'", version)
-	customLog("Info", "Build commit: '%q'", commit)
-	customLog("Info", "Build date:   '%q'", date)
+	customLog("Info", "Build version: '%s'", version)
+	customLog("Info", "Build commit: '%s'", commit)
+	customLog("Info", "Build date: '%s'", date)
 
 	mux := http.NewServeMux()
 	// Wrap handleData with config using a closure
@@ -743,7 +743,7 @@ func main() {
 	}
 
 	// log.Printf("Starting server on %s", server.Addr)
-	customLog("Info", "Starting server on: '%q'", server.Addr)
+	customLog("Info", "Starting server on: '%s'", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
 		// log.Fatalf("Server failed: %s", err)
 		customLog("Error", "Server failed: %v", err)
@@ -794,7 +794,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	// Fill the default values for HomeAssistant Origin MQTT config
 	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
 	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
-	customLog("Info", "Default Origin: %+v", homeAssistantOrigin)
+	customLog("Debug", "Default Origin: %+v", homeAssistantOrigin)
 
 	// Fill the default values for HomeAssistant Device MQTT config
 	homeAssistantDevice := FillDefaultHomeAssistantDevice()
@@ -804,7 +804,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	homeAssistantDevice.Model = strings.ToUpper(modelName)
 	homeAssistantDevice.HwVersion = modelVersion
 	// log.Printf("Default Device: %+v", homeAssistantDevice)
-	customLog("Info", "Default Device: %+v", homeAssistantDevice)
+	customLog("Debug", "Default Device: %+v", homeAssistantDevice)
 
 	var data = make(map[string]string)
 	if err := r.ParseForm(); err != nil {
