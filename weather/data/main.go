@@ -18,11 +18,12 @@ import (
 )
 
 const (
-	clientID   = "go-mqtt-subscriber"
-	topic      = "homeassistant/sensor/weather/state"
-	ColorReset = "\033[0m"
-	ColorCyan  = "\033[36m" // DEBUG
-	ColorGreen = "\033[32m" // INFO
+	clientID    = "go-mqtt-subscriber"
+	topic       = "homeassistant/sensor/weather/state"
+	ColorReset  = "\033[0m"
+	ColorCyan   = "\033[36m" // DEBUG
+	ColorGreen  = "\033[32m" // INFO
+	ColorYellow = "\033[33m" // WARN
 )
 
 // Global map for safely tracking registered topics
@@ -188,6 +189,8 @@ func customLog(level string, format string, v ...any) {
 		color = ColorCyan
 	case "INFO":
 		color = ColorGreen
+	case "WARN":
+		color = ColorYellow
 	default:
 		color = ColorReset
 	}
@@ -838,7 +841,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("Error", "Message: %v", err)
 		return
 	}
-	customLog("Debug", "Original data: %q", jsonOriginalData)
+	customLog("Debug", "Original data: '%v'", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
@@ -888,7 +891,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("Error", "Message: %v", err)
 		return
 	}
-	customLog("Info", "Converted data: %q", jsonData)
+	customLog("Info", "Converted data: '%v'", jsonData)
 	// payload, err := json.MarshalIndent(sensors, "", "  ")
 
 	// Correct logging
