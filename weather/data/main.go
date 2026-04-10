@@ -720,7 +720,7 @@ func main() {
 	})
 
 	server := &http.Server{
-		Addr:              ":8080",
+		Addr:              ":80",
 		Handler:           mux,
 		ReadHeaderTimeout: 5 * time.Second,  // Protects against Slowloris attacks
 		ReadTimeout:       15 * time.Second, // Time to read request body
