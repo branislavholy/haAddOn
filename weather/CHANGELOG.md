@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.5.0](https://github.com/branislavholy/haAddOn/compare/v1.4.21...v1.5.0) (2026-04-10)
+
+
+### Features
+
+* add mqtt sync.Map of topic ([7e06bd5](https://github.com/branislavholy/haAddOn/commit/7e06bd563019cfaca641df7d488f64c5ea46262a))
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/text to v0.36.0 ([a037145](https://github.com/branislavholy/haAddOn/commit/a0371455c7e9506363f8f76ed47e3cc785c9259c))
+* update listen port ([f8b8aa2](https://github.com/branislavholy/haAddOn/commit/f8b8aa2898adff3656cb16639b7477f9df49da16))
+
 ## [1.4.21](https://github.com/branislavholy/haAddOn/compare/v1.4.20...v1.4.21) (2026-04-08)
 
 
