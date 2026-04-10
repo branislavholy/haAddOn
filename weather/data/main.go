@@ -29,6 +29,8 @@ const (
 // Global map for safely tracking registered topics
 var registeredTopics sync.Map
 
+var currentLogLevelPriority int
+
 var mqttMsgChan = make(chan mqtt.Message)
 
 var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
@@ -157,7 +159,7 @@ func addSensor(name, class, unit, key, id, entity, measurement string) HomeAssis
 }
 
 // Split string to string and number as string
-func GetDeviceModelInfo(input string) (string, string) {
+func GetDeviceModelINFO(input string) (string, string) {
 	regexName := regexp.MustCompile(`[a-zA-Z]+`)
 	regexVersion := regexp.MustCompile(`[0-9]+`)
 
@@ -169,17 +171,35 @@ func GetDeviceModelInfo(input string) (string, string) {
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 	// fmt.Println("Connected to MQTT Broker")
-	customLog("Info", "Connected to MQTT Broker")
+	customLog("INFO", "Connected to MQTT Broker")
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
 	// fmt.Printf("Connection lost: %v", err)
-	customLog("Error", "Connection lost: %v", err)
+	customLog("ERROR", "Connection lost: %v", err)
 }
 
+func getLevelPriority(level string) int {
+	switch strings.ToUpper(level) {
+	case "DEBUG":
+		return 1
+	case "INFO":
+		return 2
+	case "WARN":
+		return 3
+	case "ERROR":
+		return 4
+	default:
+		return 2 // Default to INFO
+	}
+}
 func customLog(level string, format string, v ...any) {
 	// timestamp := time.Now().Format("2006-01-02 15:04:05")
 	// fmt.Printf("[%s] %s: \t%s '%s'\n", timestamp, level, msg, payload)
+
+	if getLevelPriority(level) < currentLogLevelPriority {
+		return
+	}
 	var color string
 	// timestamp := time.Now().Format("15:04:05")
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
@@ -459,7 +479,7 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 		return sensorConfig.Status, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName, convertedValue, sensorConfig.Measurement
 	}
 
-	// Log warning for unknown sensor types
+	// Log WARN for unknown sensor types
 	customLog("WARN", "Unknown sensor type - key=%q (in %q system), using default mapping", key, normalizedUnitsType)
 
 	return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
@@ -489,12 +509,10 @@ func loadConfig() Config {
 			Password string `json:"password"`
 			SSL      bool   `json:"ssl"`
 		}{
-			Host: "192.168.10.20",
-			Port: 1883,
-			// Username: os.Getenv("MQTT_USERNAME"),
-			// Password: os.Getenv("MQTT_PASSWORD"),
-			Username: "weather",
-			Password: "weather",
+			Host:     "192.168.10.20",
+			Port:     1883,
+			Username: os.Getenv("MQTT_USERNAME"),
+			Password: os.Getenv("MQTT_PASSWORD"),
 			SSL:      false,
 		},
 
@@ -573,9 +591,9 @@ func loadConfig() Config {
 		config.Language = defaultConfig.Language
 	}
 
-	customLog("Info", "Load variable host: '%s'", config.MQTT.Host)
-	customLog("Info", "Load variable port: '%d'", config.MQTT.Port)
-	customLog("Info", "Load variable username: '%s'", config.MQTT.Username)
+	customLog("INFO", "Load variable host: '%s'", config.MQTT.Host)
+	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
+	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
 	return config
 }
 
@@ -666,7 +684,7 @@ func mqttConnect(config Config) mqtt.Client {
 	// Now you can initialize your MQTT client
 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
 	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Usernames)
-	customLog("Info", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
+	customLog("INFO", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
 
 	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
 	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
@@ -679,9 +697,9 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.SetKeepAlive(30 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		// log.Printf("TOPIC: %s\n", msg.Topic())
-		customLog("Info", "Topic: '%s'", msg.Topic())
+		customLog("INFO", "Topic: '%s'", msg.Topic())
 		// log.Printf("MSG: %s\n", msg.Payload())
-		customLog("Info", "Message: '%s'", msg.Payload())
+		customLog("INFO", "Message: '%s'", msg.Payload())
 	})
 
 	opts.SetPingTimeout(1 * time.Second)
@@ -696,13 +714,19 @@ func mqttConnect(config Config) mqtt.Client {
 
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		customLog("Info", "MQTT: %v", token.Error())
+		customLog("ERROR", "MQTT: %v", token.Error())
 	}
 
 	return client
 }
 
 func main() {
+
+	envLogLevel := os.Getenv("LOG_LEVEL")
+	if envLogLevel == "" {
+		envLogLevel = "INFO"
+	}
+	currentLogLevelPriority = getLevelPriority(envLogLevel)
 
 	// Load configuration with fallback to defaults
 	// config := loadConfig("/data/options.json")
@@ -714,17 +738,17 @@ func main() {
 
 	// temperatureFahrenheit := u.NewValue(tempf, u.Fahrenheit)
 	// temperatureCelsius := temperatureFahrenheit.MustConvert(u.Celsius)
-	// customLog("Info", "temperatureCelsius:", strconv.FormatFloat(temperatureCelsius.Float(), 'f', 2, 64))
+	// customLog("INFO", "temperatureCelsius:", strconv.FormatFloat(temperatureCelsius.Float(), 'f', 2, 64))
 
 	// windspeedkph := windspeedmph * 1.609344
-	// customLog("Info", "windspeedKilometerPerHour:", strconv.FormatFloat(windspeedkph, 'f', 2, 64))
+	// customLog("INFO", "windspeedKilometerPerHour:", strconv.FormatFloat(windspeedkph, 'f', 2, 64))
 
 	client := mqttConnect(config)
 	defer client.Disconnect(250)
 
-	customLog("Info", "Build version: '%s'", version)
-	customLog("Info", "Build commit: '%s'", commit)
-	customLog("Info", "Build date: '%s'", date)
+	customLog("INFO", "Build version: '%s'", version)
+	customLog("INFO", "Build commit: '%s'", commit)
+	customLog("INFO", "Build date: '%s'", date)
 
 	mux := http.NewServeMux()
 	// Wrap handleData with config using a closure
@@ -743,10 +767,10 @@ func main() {
 	}
 
 	// log.Printf("Starting server on %s", server.Addr)
-	customLog("Info", "Starting server on: '%s'", server.Addr)
+	customLog("INFO", "Starting server on: '%s'", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
 		// log.Fatalf("Server failed: %s", err)
-		customLog("Error", "Server failed: %v", err)
+		customLog("ERROR", "Server failed: %v", err)
 	}
 }
 
@@ -772,13 +796,13 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 			if !loaded {
 				// fmt.Printf("Register topic: %s\n", topic)
-				customLog("Info", "Register topic: '%s'", topic)
+				customLog("INFO", "Register topic: '%s'", topic)
 				// fmt.Printf("....Topic: %s\n", topic)
 				token := client.Publish(topic, 1, true, payload)
 
 				if token.Wait() && token.Error() != nil {
-					// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
-					customLog("Error", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
+					// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.ERROR())
+					customLog("ERROR", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
 				}
 			}
 		}(itemSenzor)
@@ -794,21 +818,21 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	// Fill the default values for HomeAssistant Origin MQTT config
 	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
 	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
-	customLog("Debug", "Default Origin: %+v", homeAssistantOrigin)
+	customLog("DEBUG", "Default Origin: %+v", homeAssistantOrigin)
 
 	// Fill the default values for HomeAssistant Device MQTT config
 	homeAssistantDevice := FillDefaultHomeAssistantDevice()
 	homeAssistantDevice.ModeId = Id
 
-	modelName, modelVersion := GetDeviceModelInfo(Id)
+	modelName, modelVersion := GetDeviceModelINFO(Id)
 	homeAssistantDevice.Model = strings.ToUpper(modelName)
 	homeAssistantDevice.HwVersion = modelVersion
 	// log.Printf("Default Device: %+v", homeAssistantDevice)
-	customLog("Debug", "Default Device: %+v", homeAssistantDevice)
+	customLog("DEBUG", "Default Device: %+v", homeAssistantDevice)
 
 	var data = make(map[string]string)
 	if err := r.ParseForm(); err != nil {
-		customLog("Error", "Message: %v", err)
+		customLog("ERROR", "Message: %v", err)
 		return
 	}
 
@@ -834,14 +858,14 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	data["winddirsite"] = calculateWindDirSite(data["winddir"])
 
 	// log.Printf("data: %s\n", data)
-	customLog("Info", "Received data: %v", data)
+	customLog("INFO", "Received data: %v", data)
 
 	jsonOriginalData, err := json.Marshal(data)
 	if err != nil {
-		customLog("Error", "Message: %v", err)
+		customLog("ERROR", "Message: %v", err)
 		return
 	}
-	customLog("Debug", "Original data: '%s'", jsonOriginalData)
+	customLog("DEBUG", "Original data: '%s'", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
@@ -883,21 +907,21 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// jsonData, err := json.Marshal(convertedData)
 	// if err != nil {
-	// 		("Error", "Message: ", err)
+	// 		("ERROR", "Message: ", err)
 	// 	return
 	// }
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		customLog("Error", "Message: %v", err)
+		customLog("ERROR", "Message: %v", err)
 		return
 	}
-	customLog("Info", "Converted data: '%s'", jsonData)
+	customLog("INFO", "Converted data: '%s'", jsonData)
 	// payload, err := json.MarshalIndent(sensors, "", "  ")
 
 	// Correct logging
 	// payload, err := json.Marshal(sensors)
 	// if err != nil {
-	// 	log.Fatalf("Error marshaling sensors: %s", err)
+	// 	log.Fatalf("ERROR marshaling sensors: %s", err)
 	// }
 
 	// fmt.Println("--- Registered Sensors Configuration ---")
@@ -935,8 +959,8 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	// opts.OnConnectionLost = connectLostHandler
 
 	// client := mqtt.NewClient(opts)
-	// if token := client.Connect(); token.Wait() && token.Error() != nil {
-	// 	customLog("Info", "MQTT:", token.Error())
+	// if token := client.Connect(); token.Wait() && token.ERROR() != nil {
+	// 	customLog("INFO", "MQTT:", token.ERROR())
 	// }
 	// defer client.Disconnect(250)
 
