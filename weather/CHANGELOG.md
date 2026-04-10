@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.5](https://github.com/branislavholy/haAddOn/compare/v1.5.4...v1.5.5) (2026-04-10)
+
+
+### Bug Fixes
+
+* update go logging ([550ef89](https://github.com/branislavholy/haAddOn/commit/550ef8975a6c815f1fead93104517bafefa3cda8))
+* update go logging ([e87d674](https://github.com/branislavholy/haAddOn/commit/e87d674926ed8b238068eb8280281a2800ec1f88))
+
 ## [1.5.4](https://github.com/branislavholy/haAddOn/compare/v1.5.3...v1.5.4) (2026-04-10)
 
 
