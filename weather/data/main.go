@@ -841,7 +841,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("Error", "Message: %v", err)
 		return
 	}
-	customLog("Debug", "Original data: '%v'", jsonOriginalData)
+	customLog("Debug", "Original data: '%s'", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
@@ -891,7 +891,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("Error", "Message: %v", err)
 		return
 	}
-	customLog("Info", "Converted data: '%v'", jsonData)
+	customLog("Info", "Converted data: '%s'", jsonData)
 	// payload, err := json.MarshalIndent(sensors, "", "  ")
 
 	// Correct logging
