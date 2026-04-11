@@ -777,54 +777,79 @@ func main() {
 }
 
 func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
-	var wg sync.WaitGroup
-
 	for _, itemSenzor := range sensors {
-		wg.Add(1)
+		topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(itemSenzor.UniqueId, UniqIdPrefix))
 
-		go func(localSenzor HomeAssistantConfig) {
-			defer wg.Done()
+		// FAST CHECK: If already registered, skip everything immediately
+		if _, alreadyRegistered := registeredTopics.Load(topic); alreadyRegistered {
+			continue
+		}
 
-			payload, _ := json.Marshal(localSenzor)
-			// payload, _ := json.MarshalIndent(localSenzor, "", "  ") // prettyJSON
-			// fmt.Printf("....Published: %s\n", payload)
+		// DISCONNECTED CHECK: Skip if network is down
+		if !client.IsConnected() {
+			continue
+		}
 
-			// Publish to the broker
-			// topic := fmt.Sprintf(topicConfig, localSenzor.Name)
-			topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix))
+		// ASYNCHRONOUS REGISTER: Use a goroutine ONLY for the network call
+		go func(s HomeAssistantConfig, t string) {
+			payload, _ := json.Marshal(s)
 
-			if !client.IsConnected() {
-				customLog("WARN", "MQTT disconnected. Cannot register %q. Will retry on next request.", topic)
-				return // Exit early; don't even try to Publish or update the Map
+			// Fire the message
+			token := client.Publish(t, 1, true, payload)
+
+			// Wait in the background so we don't block the main loop
+			if token.Wait() && token.Error() == nil {
+				registeredTopics.Store(t, true)
+				customLog("INFO", "Registered: %s", t)
 			}
-
-			// Check if topic is already registered
-			_, alreadyRegistered := registeredTopics.Load(topic)
-
-			if !alreadyRegistered {
-				// fmt.Printf("Register topic: %s\n", topic)
-				customLog("INFO", "Register topic: '%s'", topic)
-				// fmt.Printf("....Topic: %s\n", topic)]
-				token := client.Publish(topic, 1, true, payload)
-
-				if token.Wait() && token.Error() == nil {
-					registeredTopics.Store(topic, true)
-					customLog("INFO", "Successfully registered: %q", topic)
-				} else {
-					err := token.Error()
-					if err != nil {
-						// customLog("ERROR", "Failed to register %q: %v", topic, err)
-						// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.ERROR())
-						customLog("ERROR", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
-					}
-				}
-			}
-		}(itemSenzor)
+		}(itemSenzor, topic)
 	}
-
-	// Wait for ALL goroutines to finish
-	wg.Wait()
 }
+
+// func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
+// var wg sync.WaitGroup
+
+// for _, itemSenzor := range sensors {
+// 	wg.Add(1)
+
+// 	go func(localSenzor HomeAssistantConfig) {
+// 		defer wg.Done()
+
+// 		payload, _ := json.Marshal(localSenzor)
+//  	topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix))
+
+// 		if !client.IsConnected() {
+// 			customLog("WARN", "MQTT disconnected. Cannot register %q. Will retry on next request.", topic)
+// 			return // Exit early; don't even try to Publish or update the Map
+// 		}
+
+// 		// Check if topic is already registered
+// 		_, alreadyRegistered := registeredTopics.Load(topic)
+
+// 		if !alreadyRegistered {
+// 			// fmt.Printf("Register topic: %s\n", topic)
+// 			customLog("INFO", "Register topic: '%s'", topic)
+// 			// fmt.Printf("....Topic: %s\n", topic)]
+// 			token := client.Publish(topic, 1, true, payload)
+
+// 			if token.Wait() && token.Error() == nil {
+// 				registeredTopics.Store(topic, true)
+// 				customLog("INFO", "Successfully registered: %q", topic)
+// 			} else {
+// 				err := token.Error()
+// 				if err != nil {
+// 					// customLog("ERROR", "Failed to register %q: %v", topic, err)
+// 					// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.ERROR())
+// 					customLog("ERROR", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
+// 				}
+// 			}
+// 		}
+// 	}(itemSenzor)
+// }
+
+// // Wait for ALL goroutines to finish
+// wg.Wait()
+// }
 
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
 	var sensors []HomeAssistantConfig
