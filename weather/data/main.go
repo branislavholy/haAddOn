@@ -829,6 +829,8 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 			// Fire the message
 			token := client.Publish(t, 1, true, payload)
+			customLog("DEBUG", "Topic: [%s]", topic)
+			customLog("DEBUG", "Payload length: %d", len(payload))
 
 			// Wait in the background so we don't block the main loop
 			if token.Wait() && token.Error() == nil {
@@ -1038,7 +1040,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	registerSensors(client, sensors)
 
-	client.Publish(topic, 1, true, jsonData).Wait()
+	// client.Publish(topic, 1, true, jsonData).Wait()
 	// fmt.Printf("..Published State: %s\n", jsonData)
 
 	client.Disconnect(250)
