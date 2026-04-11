@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.15](https://github.com/branislavholy/haAddOn/compare/v1.5.14...v1.5.15) (2026-04-11)
+
+
+### Bug Fixes
+
+* update mqtt opts ([2b5c62a](https://github.com/branislavholy/haAddOn/commit/2b5c62ac983e638c4afa95d6f360d503269653bd))
+
 ## [1.5.14](https://github.com/branislavholy/haAddOn/compare/v1.5.13...v1.5.14) (2026-04-11)
 
 
