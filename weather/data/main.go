@@ -18,7 +18,7 @@ import (
 )
 
 const (
-	clientID    = "go-mqtt-subscriber"
+	// clientID    = "go-mqtt-subscriber"
 	topic       = "homeassistant/sensor/weather/state"
 	ColorReset  = "\033[0m"
 	ColorCyan   = "\033[36m" // Debug
@@ -694,9 +694,12 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.AddBroker(broker)
 
 	// MQTT 3.1
-	opts.SetProtocolVersion(3)
+	opts.SetProtocolVersion(4)
 
-	opts.SetClientID(clientID)
+	// go-mqtt-subscriber
+	uniqueID := fmt.Sprintf("weather-station-%d", time.Now().Unix()%1000)
+	opts.SetClientID(uniqueID)
+	// opts.SetClientID(clientID)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 
 	opts.SetKeepAlive(60 * time.Second)
