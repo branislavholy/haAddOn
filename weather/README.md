@@ -1,4 +1,4 @@
-![version](https://img.shields.io/static/v1?label=version&message=1.5.12&color=blue) <!-- x-release-please-version -->
+![version](https://img.shields.io/static/v1?label=version&message=1.5.13&color=blue) <!-- x-release-please-version -->
 [![Build](https://github.com/branislavholy/haAddOn/actions/workflows/build.yml/badge.svg)](.github/workflows/build.yml)
 [![dependabot](https://img.shields.io/badge/Dependabot-enabled-brightgreen?logo=dependabot)](.github/dependabot.yml)
 [![release-please](https://img.shields.io/badge/release--please-enabled-brightgreen?logo=google)](.github/release-please.yml)
@@ -22,7 +22,7 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build
 <!-- x-release-please-start-version -->
 ```bash
 cd ~/workspace/haAddOn/weather
-podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.5.12' .
+podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.5.13' .
 
 ```
 <!-- x-release-please-end -->
@@ -59,7 +59,7 @@ podman run --rm -it weather:latest /usr/bin/weather
 ### Remove image
 <!-- x-release-please-start-version -->
 ```bash
-podman rmi weather:1.5.12 weather:latest
+podman rmi weather:1.5.13 weather:latest
 ```
 <!-- x-release-please-end -->
 
