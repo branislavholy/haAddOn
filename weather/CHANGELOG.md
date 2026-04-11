@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.7](https://github.com/branislavholy/haAddOn/compare/v1.5.6...v1.5.7) (2026-04-11)
+
+
+### Bug Fixes
+
+* update sync map ([56b8865](https://github.com/branislavholy/haAddOn/commit/56b8865411aebd0b8b49e1fd964e4428516f26f5))
+
 ## [1.5.6](https://github.com/branislavholy/haAddOn/compare/v1.5.5...v1.5.6) (2026-04-11)
 
 
