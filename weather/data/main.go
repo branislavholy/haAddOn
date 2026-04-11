@@ -31,7 +31,7 @@ var registeredTopics sync.Map
 
 var currentLogLevelPriority int
 
-var mqttMsgChan = make(chan mqtt.Message)
+// var mqttMsgChan = make(chan mqtt.Message)
 
 // var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
 // 	mqttMsgChan <- msg
@@ -679,54 +679,78 @@ func calculateWindDirSite(windDir string) string {
 	}
 }
 
+// func mqttConnect(config Config) mqtt.Client {
+// 	opts := mqtt.NewClientOptions()
+
+// 	// Now you can initialize your MQTT client
+// 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
+// 	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Usernames)
+// 	customLog("INFO", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
+
+// 	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
+// 	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
+// 	opts.SetUsername(config.MQTT.Username)
+// 	opts.SetPassword(config.MQTT.Password)
+// 	opts.AddBroker(broker)
+
+// 	// MQTT 3.1
+// 	opts.SetProtocolVersion(5)
+
+// 	// go-mqtt-subscriber
+// 	uniqueID := fmt.Sprintf("weather-station-%d", time.Now().Unix()%1000)
+// 	opts.SetClientID(uniqueID)
+// 	// opts.SetClientID(clientID)
+// 	// opts.SetDefaultPublishHandler(messagePubHandler)
+
+// 	opts.SetKeepAlive(60 * time.Second)
+// 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
+// 		// log.Printf("TOPIC: %s\n", msg.Topic())
+// 		customLog("INFO", "Topic: '%s'", msg.Topic())
+// 		// log.Printf("MSG: %s\n", msg.Payload())
+// 		customLog("INFO", "Message: '%s'", msg.Payload())
+// 	})
+
+// 	opts.SetOrderMatters(false) // Prevents blocked handlers from killing connection
+// 	opts.SetPingTimeout(10 * time.Second)
+// 	opts.SetAutoReconnect(true)
+// 	opts.SetMaxReconnectInterval(10 * time.Second)
+// 	opts.SetConnectRetry(true)
+// 	opts.SetConnectRetryInterval(10 * time.Second)
+// 	opts.SetWriteTimeout(60 * time.Second)
+
+// 	opts.OnConnect = connectHandler
+// 	opts.OnConnectionLost = connectLostHandler
+
+// 	client := mqtt.NewClient(opts)
+// 	if token := client.Connect(); token.Wait() && token.Error() != nil {
+// 		customLog("ERROR", "MQTT: %v", token.Error())
+// 	}
+
+// 	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
+// 	return client
+// }
+
 func mqttConnect(config Config) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 
-	// Now you can initialize your MQTT client
 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Usernames)
-	customLog("INFO", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
-
-	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
-	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
-	opts.SetUsername(config.MQTT.Username)
-	opts.SetPassword(config.MQTT.Password)
 	opts.AddBroker(broker)
 
-	// MQTT 3.1
-	opts.SetProtocolVersion(5)
+	opts.SetProtocolVersion(4)
 
-	// go-mqtt-subscriber
-	uniqueID := fmt.Sprintf("weather-station-%d", time.Now().Unix()%1000)
-	opts.SetClientID(uniqueID)
-	// opts.SetClientID(clientID)
-	// opts.SetDefaultPublishHandler(messagePubHandler)
+	uID := fmt.Sprintf("weather-%d", time.Now().Unix()%1000)
+	opts.SetClientID(uID)
+	opts.SetUsername(config.MQTT.Username)
+	opts.SetPassword(config.MQTT.Password)
 
-	opts.SetKeepAlive(60 * time.Second)
-	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-		// log.Printf("TOPIC: %s\n", msg.Topic())
-		customLog("INFO", "Topic: '%s'", msg.Topic())
-		// log.Printf("MSG: %s\n", msg.Payload())
-		customLog("INFO", "Message: '%s'", msg.Payload())
-	})
-
-	opts.SetOrderMatters(false) // Prevents blocked handlers from killing connection
-	opts.SetPingTimeout(10 * time.Second)
-	opts.SetAutoReconnect(true)
-	opts.SetMaxReconnectInterval(10 * time.Second)
-	opts.SetConnectRetry(true)
-	opts.SetConnectRetryInterval(10 * time.Second)
-	opts.SetWriteTimeout(60 * time.Second)
-
-	opts.OnConnect = connectHandler
-	opts.OnConnectionLost = connectLostHandler
+	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 
 	client := mqtt.NewClient(opts)
+
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		customLog("ERROR", "MQTT: %v", token.Error())
 	}
 
-	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 	return client
 }
 
