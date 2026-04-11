@@ -828,7 +828,8 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 			payload, _ := json.Marshal(s)
 
 			// Fire the message
-			token := client.Publish(t, 1, true, payload)
+			cleanTopic := strings.TrimSpace(t)
+			token := client.Publish(cleanTopic, 0, true, payload)
 			customLog("DEBUG", "Topic: [%s]", topic)
 			customLog("DEBUG", "Payload length: %d", len(payload))
 
