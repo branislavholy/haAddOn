@@ -703,6 +703,8 @@ func mqttConnect(config Config) mqtt.Client {
 		customLog("INFO", "Message: '%s'", msg.Payload())
 	})
 
+	// MQTT 3.1.1 (in a log is p4)
+	opts.SetProtocolVersion(4)
 	opts.SetOrderMatters(false) // Prevents blocked handlers from killing connection
 	opts.SetPingTimeout(10 * time.Second)
 	opts.SetAutoReconnect(true)
