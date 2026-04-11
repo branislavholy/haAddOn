@@ -38,7 +38,7 @@ var mqttMsgChan = make(chan mqtt.Message)
 // }
 
 var (
-	version = "1.5.13" // x-release-please-version
+	version = "1.5.14" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
