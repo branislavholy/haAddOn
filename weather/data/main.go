@@ -38,7 +38,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var (
-	version = "1.5.11" // x-release-please-version
+	version = "1.5.10" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -694,7 +694,7 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.AddBroker(broker)
 
 	// MQTT 3.1
-	opts.SetProtocolVersion(2)
+	opts.SetProtocolVersion(3)
 
 	opts.SetClientID(clientID)
 	opts.SetDefaultPublishHandler(messagePubHandler)
