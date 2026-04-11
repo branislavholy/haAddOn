@@ -693,8 +693,8 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.SetPassword(config.MQTT.Password)
 	opts.AddBroker(broker)
 
-	// MQTT 3.1.1 (in a log is p4)
-	opts.SetProtocolVersion(4)
+	// MQTT 3.1
+	opts.SetProtocolVersion(2)
 
 	opts.SetClientID(clientID)
 	opts.SetDefaultPublishHandler(messagePubHandler)
