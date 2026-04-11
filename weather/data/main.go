@@ -742,6 +742,7 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.SetClientID(uID)
 	opts.SetUsername(config.MQTT.Username)
 	opts.SetPassword(config.MQTT.Password)
+	opts.SetCleanSession(false)
 
 	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 
