@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.17](https://github.com/branislavholy/haAddOn/compare/v1.5.16...v1.5.17) (2026-04-11)
+
+
+### Bug Fixes
+
+* update logs ([ed039e3](https://github.com/branislavholy/haAddOn/commit/ed039e3137e38d287f212040541e2d946c9e0c4a))
+
 ## [1.5.16](https://github.com/branislavholy/haAddOn/compare/v1.5.15...v1.5.16) (2026-04-11)
 
 
