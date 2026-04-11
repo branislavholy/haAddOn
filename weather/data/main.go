@@ -793,18 +793,30 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 			// topic := fmt.Sprintf(topicConfig, localSenzor.Name)
 			topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix))
 
+			if !client.IsConnected() {
+				customLog("WARN", "MQTT disconnected. Cannot register %q. Will retry on next request.", topic)
+				return // Exit early; don't even try to Publish or update the Map
+			}
+
 			// Check if topic is already registered
 			_, alreadyRegistered := registeredTopics.Load(topic)
 
-			if !alreadyRegistered || !client.IsConnected() {
+			if !alreadyRegistered {
 				// fmt.Printf("Register topic: %s\n", topic)
 				customLog("INFO", "Register topic: '%s'", topic)
 				// fmt.Printf("....Topic: %s\n", topic)]
 				token := client.Publish(topic, 1, true, payload)
 
-				if token.Wait() && token.Error() != nil {
-					// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.ERROR())
-					customLog("ERROR", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
+				if token.Wait() && token.Error() == nil {
+					registeredTopics.Store(topic, true)
+					customLog("INFO", "Successfully registered: %q", topic)
+				} else {
+					err := token.Error()
+					if err != nil {
+						// customLog("ERROR", "Failed to register %q: %v", topic, err)
+						// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.ERROR())
+						customLog("ERROR", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
+					}
 				}
 			}
 		}(itemSenzor)
