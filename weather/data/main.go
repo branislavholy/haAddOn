@@ -33,9 +33,9 @@ var currentLogLevelPriority int
 
 var mqttMsgChan = make(chan mqtt.Message)
 
-var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-	mqttMsgChan <- msg
-}
+// var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
+// 	mqttMsgChan <- msg
+// }
 
 var (
 	version = "1.5.13" // x-release-please-version
@@ -694,13 +694,13 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.AddBroker(broker)
 
 	// MQTT 3.1
-	opts.SetProtocolVersion(4)
+	opts.SetProtocolVersion(5)
 
 	// go-mqtt-subscriber
 	uniqueID := fmt.Sprintf("weather-station-%d", time.Now().Unix()%1000)
 	opts.SetClientID(uniqueID)
 	// opts.SetClientID(clientID)
-	opts.SetDefaultPublishHandler(messagePubHandler)
+	// opts.SetDefaultPublishHandler(messagePubHandler)
 
 	opts.SetKeepAlive(60 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
