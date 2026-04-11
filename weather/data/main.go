@@ -794,12 +794,12 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 			topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix))
 
 			// Check if topic is already registered
-			_, loaded := registeredTopics.LoadOrStore(topic, true)
+			_, alreadyRegistered := registeredTopics.Load(topic)
 
-			if !loaded {
+			if !alreadyRegistered || !client.IsConnected() {
 				// fmt.Printf("Register topic: %s\n", topic)
 				customLog("INFO", "Register topic: '%s'", topic)
-				// fmt.Printf("....Topic: %s\n", topic)
+				// fmt.Printf("....Topic: %s\n", topic)]
 				token := client.Publish(topic, 1, true, payload)
 
 				if token.Wait() && token.Error() != nil {
