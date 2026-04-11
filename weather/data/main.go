@@ -695,7 +695,7 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.SetClientID(clientID)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 
-	opts.SetKeepAlive(30 * time.Second)
+	opts.SetKeepAlive(60 * time.Second)
 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
 		// log.Printf("TOPIC: %s\n", msg.Topic())
 		customLog("INFO", "Topic: '%s'", msg.Topic())
@@ -703,7 +703,8 @@ func mqttConnect(config Config) mqtt.Client {
 		customLog("INFO", "Message: '%s'", msg.Payload())
 	})
 
-	opts.SetPingTimeout(1 * time.Second)
+	opts.SetOrderMatters(false) // Prevents blocked handlers from killing connection
+	opts.SetPingTimeout(10 * time.Second)
 	opts.SetAutoReconnect(true)
 	opts.SetMaxReconnectInterval(10 * time.Second)
 	opts.SetConnectRetry(true)
