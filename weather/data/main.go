@@ -38,7 +38,7 @@ var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Me
 }
 
 var (
-	version = "1.5.9" // x-release-please-version
+	version = "1.5.8" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -692,6 +692,10 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.SetUsername(config.MQTT.Username)
 	opts.SetPassword(config.MQTT.Password)
 	opts.AddBroker(broker)
+
+	// MQTT 3.1.1 (in a log is p4)
+	opts.SetProtocolVersion(4)
+
 	opts.SetClientID(clientID)
 	opts.SetDefaultPublishHandler(messagePubHandler)
 
@@ -703,8 +707,6 @@ func mqttConnect(config Config) mqtt.Client {
 		customLog("INFO", "Message: '%s'", msg.Payload())
 	})
 
-	// MQTT 3.1.1 (in a log is p4)
-	opts.SetProtocolVersion(4)
 	opts.SetOrderMatters(false) // Prevents blocked handlers from killing connection
 	opts.SetPingTimeout(10 * time.Second)
 	opts.SetAutoReconnect(true)
@@ -721,6 +723,7 @@ func mqttConnect(config Config) mqtt.Client {
 		customLog("ERROR", "MQTT: %v", token.Error())
 	}
 
+	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 	return client
 }
 
