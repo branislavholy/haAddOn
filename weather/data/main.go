@@ -679,81 +679,83 @@ func calculateWindDirSite(windDir string) string {
 	}
 }
 
+func mqttConnect(config Config) mqtt.Client {
+	opts := mqtt.NewClientOptions()
+
+	// Configure broker connection string
+	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
+	customLog("INFO", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
+
+	// Set credentials and broker URI
+	opts.SetUsername(config.MQTT.Username)
+	opts.SetPassword(config.MQTT.Password)
+	opts.AddBroker(broker)
+
+	// Force MQTT 3.1.1 for better compatibility with Mosquitto
+	opts.SetProtocolVersion(4)
+
+	// Generate a unique ClientID to avoid connection loops
+	uniqueID := fmt.Sprintf("weather-station-%d", time.Now().UnixNano()%100000)
+	opts.SetClientID(uniqueID)
+
+	// Configure message handling and logging
+	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
+		customLog("INFO", "Topic: '%s' Message: '%s'", msg.Topic(), msg.Payload())
+	})
+
+	// Disable strict ordering to allow concurrent message processing in goroutines
+	opts.SetOrderMatters(false)
+
+	// Set timeouts and keep-alive for connection stability
+	opts.SetKeepAlive(60 * time.Second)
+	opts.SetPingTimeout(10 * time.Second)
+	opts.SetWriteTimeout(10 * time.Second)
+
+	// Enable automatic reconnection and persistence
+	opts.SetAutoReconnect(true)
+	opts.SetConnectRetry(true)
+	opts.SetCleanSession(false)
+
+	// Assign connection event handlers
+	opts.OnConnect = connectHandler
+	opts.OnConnectionLost = connectLostHandler
+
+	// Initialize the client and wait for a successful connection
+	client := mqtt.NewClient(opts)
+	if token := client.Connect(); token.Wait() && token.Error() != nil {
+		customLog("ERROR", "MQTT Connection error: %v", token.Error())
+	}
+
+	// Verify the actual protocol version used by the client
+	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
+
+	return client
+}
+
 // func mqttConnect(config Config) mqtt.Client {
 // 	opts := mqtt.NewClientOptions()
 
-// 	// Now you can initialize your MQTT client
 // 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-// 	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Usernames)
-// 	customLog("INFO", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
-
-// 	// opts.SetUsername(os.Getenv("MQTT_USERNAME"))
-// 	// opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
-// 	opts.SetUsername(config.MQTT.Username)
-// 	opts.SetPassword(config.MQTT.Password)
 // 	opts.AddBroker(broker)
 
-// 	// MQTT 3.1
-// 	opts.SetProtocolVersion(5)
+// 	opts.SetProtocolVersion(4)
 
-// 	// go-mqtt-subscriber
-// 	uniqueID := fmt.Sprintf("weather-station-%d", time.Now().Unix()%1000)
-// 	opts.SetClientID(uniqueID)
-// 	// opts.SetClientID(clientID)
-// 	// opts.SetDefaultPublishHandler(messagePubHandler)
+// 	uID := fmt.Sprintf("weather-%d", time.Now().Unix()%1000)
+// 	opts.SetClientID(uID)
+// 	opts.SetUsername(config.MQTT.Username)
+// 	opts.SetPassword(config.MQTT.Password)
+// 	opts.SetCleanSession(false)
 
-// 	opts.SetKeepAlive(60 * time.Second)
-// 	opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-// 		// log.Printf("TOPIC: %s\n", msg.Topic())
-// 		customLog("INFO", "Topic: '%s'", msg.Topic())
-// 		// log.Printf("MSG: %s\n", msg.Payload())
-// 		customLog("INFO", "Message: '%s'", msg.Payload())
-// 	})
-
-// 	opts.SetOrderMatters(false) // Prevents blocked handlers from killing connection
-// 	opts.SetPingTimeout(10 * time.Second)
-// 	opts.SetAutoReconnect(true)
-// 	opts.SetMaxReconnectInterval(10 * time.Second)
-// 	opts.SetConnectRetry(true)
-// 	opts.SetConnectRetryInterval(10 * time.Second)
-// 	opts.SetWriteTimeout(60 * time.Second)
-
-// 	opts.OnConnect = connectHandler
-// 	opts.OnConnectionLost = connectLostHandler
+// 	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 
 // 	client := mqtt.NewClient(opts)
+
 // 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 // 		customLog("ERROR", "MQTT: %v", token.Error())
 // 	}
 
-// 	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 // 	return client
 // }
-
-func mqttConnect(config Config) mqtt.Client {
-	opts := mqtt.NewClientOptions()
-
-	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-	opts.AddBroker(broker)
-
-	opts.SetProtocolVersion(4)
-
-	uID := fmt.Sprintf("weather-%d", time.Now().Unix()%1000)
-	opts.SetClientID(uID)
-	opts.SetUsername(config.MQTT.Username)
-	opts.SetPassword(config.MQTT.Password)
-	opts.SetCleanSession(false)
-
-	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
-
-	client := mqtt.NewClient(opts)
-
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		customLog("ERROR", "MQTT: %v", token.Error())
-	}
-
-	return client
-}
 
 func main() {
 
@@ -809,83 +811,94 @@ func main() {
 	}
 }
 
-func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
-	for _, itemSenzor := range sensors {
-		topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(itemSenzor.UniqueId, UniqIdPrefix))
-
-		// FAST CHECK: If already registered, skip everything immediately
-		if _, alreadyRegistered := registeredTopics.Load(topic); alreadyRegistered {
-			continue
-		}
-
-		// DISCONNECTED CHECK: Skip if network is down
-		if !client.IsConnected() {
-			continue
-		}
-
-		// ASYNCHRONOUS REGISTER: Use a goroutine ONLY for the network call
-		go func(s HomeAssistantConfig, t string) {
-			payload, _ := json.Marshal(s)
-
-			// Fire the message
-			cleanTopic := strings.TrimSpace(t)
-			token := client.Publish(cleanTopic, 0, true, payload)
-			customLog("DEBUG", "Topic: [%s]", topic)
-			customLog("DEBUG", "Payload length: %d", len(payload))
-
-			// Wait in the background so we don't block the main loop
-			if token.Wait() && token.Error() == nil {
-				registeredTopics.Store(t, true)
-				customLog("INFO", "Registered: %s", t)
-			}
-		}(itemSenzor, topic)
-	}
-}
-
 // func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
-// var wg sync.WaitGroup
+// 	for _, itemSenzor := range sensors {
+// 		topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(itemSenzor.UniqueId, UniqIdPrefix))
 
-// for _, itemSenzor := range sensors {
-// 	wg.Add(1)
+// 		// FAST CHECK: If already registered, skip everything immediately
+// 		if _, alreadyRegistered := registeredTopics.Load(topic); alreadyRegistered {
+// 			continue
+// 		}
 
-// 	go func(localSenzor HomeAssistantConfig) {
-// 		defer wg.Done()
-
-// 		payload, _ := json.Marshal(localSenzor)
-//  	topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix))
-
+// 		// DISCONNECTED CHECK: Skip if network is down
 // 		if !client.IsConnected() {
-// 			customLog("WARN", "MQTT disconnected. Cannot register %q. Will retry on next request.", topic)
-// 			return // Exit early; don't even try to Publish or update the Map
+// 			continue
 // 		}
 
-// 		// Check if topic is already registered
-// 		_, alreadyRegistered := registeredTopics.Load(topic)
+// 		// ASYNCHRONOUS REGISTER: Use a goroutine ONLY for the network call
+// 		go func(s HomeAssistantConfig, t string) {
+// 			payload, _ := json.Marshal(s)
 
-// 		if !alreadyRegistered {
-// 			// fmt.Printf("Register topic: %s\n", topic)
-// 			customLog("INFO", "Register topic: '%s'", topic)
-// 			// fmt.Printf("....Topic: %s\n", topic)]
-// 			token := client.Publish(topic, 1, true, payload)
+// 			// Fire the message
+// 			cleanTopic := strings.TrimSpace(t)
+// 			token := client.Publish(cleanTopic, 0, true, payload)
+// 			customLog("DEBUG", "Topic: [%s]", topic)
+// 			customLog("DEBUG", "Payload length: %d", len(payload))
 
+// 			// Wait in the background so we don't block the main loop
 // 			if token.Wait() && token.Error() == nil {
-// 				registeredTopics.Store(topic, true)
-// 				customLog("INFO", "Successfully registered: %q", topic)
-// 			} else {
-// 				err := token.Error()
-// 				if err != nil {
-// 					// customLog("ERROR", "Failed to register %q: %v", topic, err)
-// 					// fmt.Printf("--Failed to register %s: %v\n", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.ERROR())
-// 					customLog("ERROR", "Failed to register '%s': %v", strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix), token.Error())
-// 				}
+// 				registeredTopics.Store(t, true)
+// 				customLog("INFO", "Registered: %s", t)
 // 			}
-// 		}
-// 	}(itemSenzor)
+// 		}(itemSenzor, topic)
+// 	}
 // }
 
-// // Wait for ALL goroutines to finish
-// wg.Wait()
-// }
+func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
+	var wg sync.WaitGroup
+	// Create a buffered channel to limit concurrency and prevent MQTT flooding
+	semaphore := make(chan struct{}, 3)
+
+	for _, itemSenzor := range sensors {
+		wg.Add(1)
+
+		go func(localSenzor HomeAssistantConfig) {
+			defer wg.Done()
+
+			// Create topic by removing prefix from UniqueId
+			sensorID := strings.TrimPrefix(localSenzor.UniqueId, UniqIdPrefix)
+			topic := fmt.Sprintf(topicConfig, sensorID)
+
+			// Fast check if already registered to skip network operations
+			if _, alreadyRegistered := registeredTopics.Load(topic); alreadyRegistered {
+				return
+			}
+
+			// Acquire a slot in the semaphore to proceed with MQTT communication
+			semaphore <- struct{}{}
+			// Release the slot when the goroutine finishes
+			defer func() { <-semaphore }()
+
+			// Verify client connection state before publishing
+			if !client.IsConnected() {
+				customLog("WARN", "MQTT disconnected. Registration for %q deferred.", sensorID)
+				return
+			}
+
+			// Prepare the JSON payload for Home Assistant discovery
+			payload, err := json.Marshal(localSenzor)
+			if err != nil {
+				customLog("ERROR", "Failed to marshal JSON for %s: %v", sensorID, err)
+				return
+			}
+
+			// Publish discovery message with QoS 1 and Retain flag set to true
+			customLog("INFO", "Registering new sensor: %s", sensorID)
+			token := client.Publish(topic, 1, true, payload)
+
+			// Wait for broker acknowledgment and store success in the local map
+			if token.Wait() && token.Error() == nil {
+				registeredTopics.Store(topic, true)
+				customLog("INFO", "Sensor %s successfully registered.", sensorID)
+			} else {
+				customLog("ERROR", "Registration failed for %s: %v", sensorID, token.Error())
+			}
+		}(itemSenzor)
+	}
+
+	// Block until all sensor registrations are processed
+	wg.Wait()
+}
 
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
 	var sensors []HomeAssistantConfig
