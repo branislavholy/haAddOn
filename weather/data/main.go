@@ -847,7 +847,7 @@ func main() {
 func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 	var wg sync.WaitGroup
 	// Create a buffered channel to limit concurrency and prevent MQTT flooding
-	semaphore := make(chan struct{}, 3)
+	semaphore := make(chan struct{}, 1)
 
 	for _, itemSenzor := range sensors {
 		wg.Add(1)
