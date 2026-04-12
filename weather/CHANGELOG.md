@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.20](https://github.com/branislavholy/haAddOn/compare/v1.5.19...v1.5.20) (2026-04-12)
+
+
+### Bug Fixes
+
+* update mqtt func ([3286ca4](https://github.com/branislavholy/haAddOn/commit/3286ca4352667285e986f8bd907fbecb141a2771))
+
 ## [1.5.19](https://github.com/branislavholy/haAddOn/compare/v1.5.18...v1.5.19) (2026-04-12)
 
 
