@@ -38,7 +38,7 @@ var currentLogLevelPriority int
 // }
 
 var (
-	version = "1.5.20" // x-release-please-version
+	version = "1.5.19" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -882,14 +882,17 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 				return
 			}
 
-			// Publish discovery message with QoS 1 and Retain flag set to true
+			// Publish discovery message with QoS 0 and Retain flag set to true
 			customLog("INFO", "Registering new sensor: %s", sensorID)
-			token := client.Publish(topic, 1, true, payload)
+			token := client.Publish(topic, 0, true, payload)
 
 			// Wait for broker acknowledgment and store success in the local map
 			if token.Wait() && token.Error() == nil {
 				registeredTopics.Store(topic, true)
 				customLog("INFO", "Sensor %s successfully registered.", sensorID)
+				// ADD THIS DELAY: Give Mosquitto 100ms to breathe between sensors
+				// This prevents the "flood" that causes the EOF disconnect.
+				time.Sleep(100 * time.Millisecond)
 			} else {
 				customLog("ERROR", "Registration failed for %s: %v", sensorID, token.Error())
 			}
