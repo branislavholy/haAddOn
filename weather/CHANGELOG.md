@@ -5,7 +5,7 @@
 
 ### Bug Fixes
 
-* increse topic creation ([8a0a261](https://github.com/branislavholy/haAddOn/commit/8a0a261bea5d03669c87318ce0cf715d6bf70ea7))
+* increase topic creation ([8a0a261](https://github.com/branislavholy/haAddOn/commit/8a0a261bea5d03669c87318ce0cf715d6bf70ea7))
 
 ## [1.5.25](https://github.com/branislavholy/haAddOn/compare/v1.5.24...v1.5.25) (2026-04-13)
 
