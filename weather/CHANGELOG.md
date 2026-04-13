@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.24](https://github.com/branislavholy/haAddOn/compare/v1.5.23...v1.5.24) (2026-04-13)
+
+
+### Bug Fixes
+
+* update input variables ([ec2403c](https://github.com/branislavholy/haAddOn/commit/ec2403cd62a91a81303cf563d41a881105c9cdbd))
+
 ## [1.5.23](https://github.com/branislavholy/haAddOn/compare/v1.5.22...v1.5.23) (2026-04-13)
 
 
