@@ -585,16 +585,27 @@ func loadConfig() (Config, error) {
 	// if config.MQTT.Password == "" {
 	// 	config.MQTT.Password = defaultConfig.MQTT.Password
 	// }
-	if config.UnitOfMeasurement == "" {
-		config.UnitOfMeasurement = defaultConfig.UnitOfMeasurement
-	}
-	if config.Language == "" {
-		config.Language = defaultConfig.Language
+
+	if config.MQTT.Port <= 0 || config.MQTT.Port > 65535 {
+		return Config{}, fmt.Errorf("mqtt port must be between 1 and 65535")
 	}
 
-	customLog("INFO", "Load variable host: '%s'", config.MQTT.Host)
+	if config.MQTT.Username == "" || config.MQTT.Password == "" {
+		return Config{}, fmt.Errorf("mqtt username and password must be provided")
+	}
+
+	if haLanguage := os.Getenv("HA_LANGUAGE"); haLanguage != "" {
+		config.Language = strings.TrimSpace(haLanguage)
+	}
+
+	if haUnits := os.Getenv("HA_UNITS"); haUnits != "" {
+		config.UnitOfMeasurement = strings.TrimSpace(haUnits)
+	}
+
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
+	customLog("INFO", "Load variable language: '%s'", config.Language)
+	customLog("INFO", "Load variable unit of measurement: '%s'", config.UnitOfMeasurement)
 	return config, nil
 }
 
