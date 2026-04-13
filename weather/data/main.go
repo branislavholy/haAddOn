@@ -38,7 +38,7 @@ var currentLogLevelPriority int
 // }
 
 var (
-	version = "1.5.21" // x-release-please-version
+	version = "1.5.19" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -1055,10 +1055,8 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	// }
 	// defer client.Disconnect(250)
 
-	registerSensors(client, sensors)
+	go registerSensors(client, sensors)
 
 	// client.Publish(topic, 1, true, jsonData).Wait()
 	// fmt.Printf("..Published State: %s\n", jsonData)
-
-	client.Disconnect(250)
 }
