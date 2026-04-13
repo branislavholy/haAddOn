@@ -501,7 +501,7 @@ func getLocalizedName(sensorKey, language string) string {
 
 // loadConfig loads configuration from file with fallback to defaults
 // func loadConfig(configPath string) Config {
-func loadConfig() Config {
+func loadConfig() (Config, error) {
 	defaultConfig := Config{
 		MQTT: struct {
 			Host     string `json:"host"`
@@ -510,7 +510,7 @@ func loadConfig() Config {
 			Password string `json:"password"`
 			SSL      bool   `json:"ssl"`
 		}{
-			Host:     "192.168.10.20",
+			Host:     "homeassistant",
 			Port:     1883,
 			Username: os.Getenv("MQTT_USERNAME"),
 			Password: os.Getenv("MQTT_PASSWORD"),
@@ -534,7 +534,7 @@ func loadConfig() Config {
 	// }
 
 	// Parse JSON config
-	var config Config
+	config := defaultConfig
 	// if err := json.Unmarshal(file, &config); err != nil {
 	// 	log.Printf("ERROR: Failed to parse config JSON: %v, using defaults", err)
 	// 	return defaultConfig
@@ -542,27 +542,23 @@ func loadConfig() Config {
 
 	// Override with environment variables if set
 	if envHost := os.Getenv("MQTT_HOSTNAME"); envHost != "" {
-		config.MQTT.Host = envHost
-	} else {
-		config.MQTT.Host = defaultConfig.MQTT.Host
+		config.MQTT.Host = strings.TrimSpace(envHost)
+	}
+
+	if envUser := os.Getenv("MQTT_USERNAME"); envUser != "" {
+		config.MQTT.Username = strings.TrimSpace(envUser)
 	}
 
 	if envPort := os.Getenv("MQTT_PORT"); envPort != "" {
 		if port, err := strconv.Atoi(envPort); err == nil {
 			config.MQTT.Port = port
 		} else {
-			// log.Printf("ERROR: Failed to parse MQTT_PORT %q, using default", envPort)
 			customLog("ERROR", "Failed to parse MQTT_PORT %q, using default", envPort)
-			config.MQTT.Port = defaultConfig.MQTT.Port
 		}
-	} else {
-		config.MQTT.Port = defaultConfig.MQTT.Port
 	}
 
-	if envUser := os.Getenv("MQTT_USERNAME"); envUser != "" {
-		config.MQTT.Username = envUser
-	} else {
-		config.MQTT.Username = defaultConfig.MQTT.Username
+	if config.MQTT.Port <= 0 || config.MQTT.Port > 65535 {
+		return Config{}, fmt.Errorf("mqtt port must be between 1 and 65535")
 	}
 
 	if envPass := os.Getenv("MQTT_PASSWORD"); envPass != "" {
@@ -570,6 +566,10 @@ func loadConfig() Config {
 	} else {
 		customLog("ERROR", "MQTT_PASSWORD is not defined in environment variables")
 		// os.Exit(1)
+	}
+
+	if config.MQTT.Username == "" || config.MQTT.Password == "" {
+		return Config{}, fmt.Errorf("mqtt username and password must be provided")
 	}
 
 	// // Validate and fill missing values with defaults
@@ -595,7 +595,7 @@ func loadConfig() Config {
 	customLog("INFO", "Load variable host: '%s'", config.MQTT.Host)
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
-	return config
+	return config, nil
 }
 
 func calculateWindChill(tempF, windSpeedMph string) string {
@@ -767,7 +767,11 @@ func main() {
 
 	// Load configuration with fallback to defaults
 	// config := loadConfig("/data/options.json")
-	config := loadConfig()
+	config, err := loadConfig()
+	if err != nil {
+		customLog("ERROR", "Configuration error: %v", err)
+		os.Exit(1)
+	}
 
 	// // Now you can initialize your MQTT client
 	// broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
