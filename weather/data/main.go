@@ -882,9 +882,9 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 				return
 			}
 
-			// Publish discovery message with QoS 0 and Retain flag set to true
+			// Publish discovery message with QoS 1 and Retain flag set to true
 			customLog("INFO", "Registering new sensor: %s", sensorID)
-			token := client.Publish(topic, 0, true, payload)
+			token := client.Publish(topic, 1, true, payload)
 
 			// Wait for broker acknowledgment and store success in the local map
 			if token.Wait() && token.Error() == nil {
@@ -1057,6 +1057,6 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	go registerSensors(client, sensors)
 
-	// client.Publish(topic, 1, true, jsonData).Wait()
+	client.Publish(topic, 1, true, jsonData).Wait()
 	// fmt.Printf("..Published State: %s\n", jsonData)
 }
