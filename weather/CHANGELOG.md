@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.27](https://github.com/branislavholy/haAddOn/compare/v1.5.26...v1.5.27) (2026-04-13)
+
+
+### Bug Fixes
+
+* change parallel topic creation ([029e860](https://github.com/branislavholy/haAddOn/commit/029e860466842c4fc8a77ddce957332d42fe589e))
+
 ## [1.5.26](https://github.com/branislavholy/haAddOn/compare/v1.5.25...v1.5.26) (2026-04-13)
 
 
