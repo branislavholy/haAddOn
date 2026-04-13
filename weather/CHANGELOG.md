@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.23](https://github.com/branislavholy/haAddOn/compare/v1.5.22...v1.5.23) (2026-04-13)
+
+
+### Bug Fixes
+
+* update send data to topics ([a4258ef](https://github.com/branislavholy/haAddOn/commit/a4258efccfe06176cb59a84adb81e4d368d08409))
+
 ## [1.5.22](https://github.com/branislavholy/haAddOn/compare/v1.5.21...v1.5.22) (2026-04-13)
 
 
