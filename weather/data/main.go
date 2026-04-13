@@ -38,7 +38,7 @@ var currentLogLevelPriority int
 // }
 
 var (
-	version = "1.5.24" // x-release-please-version
+	version = "1.5.25" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
