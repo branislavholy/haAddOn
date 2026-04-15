@@ -12,7 +12,7 @@ ports:
   80/tcp: 80
 options:
   language: en
-  uof: metric
+  unit_system: metric
   hostname: ''
   port: 1883
   username: branislav
@@ -20,7 +20,7 @@ options:
   log_level: info
 schema:
   language: list(en|sk)
-  uof: list(metric|imperial)
+  unit_system: list(metric|imperial)
   hostname: str?
   port: int?
   username: str

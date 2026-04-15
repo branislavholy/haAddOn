@@ -72,8 +72,8 @@ type Config struct {
 		SSL      bool   `json:"ssl"`
 	} `json:"mqtt"`
 
-	UnitOfMeasurement string `json:"uof"`
-	Language          string `json:"language"`
+	UnitSystem string `json:"unit_system"`
+	Language   string `json:"language"`
 }
 
 // HomeAssistant Device structure
@@ -99,18 +99,19 @@ type HomeAssistantOrigin struct {
 
 // HomeAssistant Config structure
 type HomeAssistantConfig struct {
-	DefaultEntityId   string              `json:"default_entity_id"`
-	DeviceClass       string              `json:"device_class,omitempty"`
-	EnabledByDefault  bool                `json:"enabled_by_default"`
-	StateClass        string              `json:"state_class,omitempty"`
-	StateTopic        string              `json:"state_topic"`
-	UniqueId          string              `json:"unique_id"`
-	UnitOfMeasurement string              `json:"unit_of_measurement,omitempty"`
-	ValueTemplate     string              `json:"value_template"`
-	Name              string              `json:"name"`
-	ObjectId          string              `json:"object_id,omitempty"`
-	Device            HomeAssistantDevice `json:"device"`
-	Origin            HomeAssistantOrigin `json:"origin"`
+	DefaultEntityId            string              `json:"default_entity_id"`
+	DeviceClass                string              `json:"device_class,omitempty"`
+	EnabledByDefault           bool                `json:"enabled_by_default"`
+	StateClass                 string              `json:"state_class,omitempty"`
+	StateTopic                 string              `json:"state_topic"`
+	UniqueId                   string              `json:"unique_id"`
+	UnitOfMeasurement          string              `json:"unit_of_measurement,omitempty"`
+	SuggestedUnitOfMeasurement string              `json:"suggested_unit_of_measurement,omitempty"`
+	ValueTemplate              string              `json:"value_template"`
+	Name                       string              `json:"name"`
+	ObjectId                   string              `json:"object_id,omitempty"`
+	Device                     HomeAssistantDevice `json:"device"`
+	Origin                     HomeAssistantOrigin `json:"origin"`
 }
 
 // Set default for Origin
@@ -154,6 +155,9 @@ func addSensor(name, class, unit, key, id, entity, measurement string) HomeAssis
 	c.ValueTemplate = key
 	c.DefaultEntityId = entity
 	c.StateClass = measurement
+	if class == "wind_speed" {
+		c.SuggestedUnitOfMeasurement = unit
+	}
 
 	return c
 }
@@ -378,8 +382,8 @@ var unitsMetric = map[string]SensorConfig{
 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "hPa", Measurement: "measurement"},
-	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "km/h", Measurement: "measurement"},
-	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "km/h", Measurement: "measurement"}, // suggested_unit_of_measurement
+	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // km/h
+	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // suggested_unit_of_measurement
 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
@@ -411,7 +415,7 @@ var defaultSensorConfig = SensorConfig{
 }
 
 // convertToMetric converts imperial values to metric for specific sensor types
-func convertToMetric(key, value string) string {
+func convertToMetric(key, value string, unit string) string {
 	// Parse value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
@@ -426,10 +430,14 @@ func convertToMetric(key, value string) string {
 		// Fahrenheit to Celsius
 		converted = (val - 32) * 5 / 9
 	case "windspeedmph", "windgustmph":
-		// mph to km/hs
-		converted = val * 1.609344
-		// // mph to m/s
-		// converted = val * 0.44704
+		if unit == "km/h" {
+			// mph to km/hs
+			converted = val * 1.609344
+		}
+		if unit == "m/s" {
+			// mph to m/s
+			converted = val * 0.44704
+		}
 	case "baromin":
 		// inHg to hPa
 		converted = val * 33.8639
@@ -449,7 +457,7 @@ func convertToMetric(key, value string) string {
 func transformInput(key, value string, config Config) (status, deviceClass, unit, localizedName, convertedValue, measurement string) {
 	// Convert key to lowercase for case-insensitive lookup
 	normalizedKey := strings.ToLower(strings.TrimSpace(key))
-	normalizedUnitsType := strings.ToLower(strings.TrimSpace(config.UnitOfMeasurement))
+	normalizedUnitsType := strings.ToLower(strings.TrimSpace(config.UnitSystem))
 	localizedName = getLocalizedName(normalizedKey, config.Language)
 
 	// Select the appropriate unit system map
@@ -463,7 +471,7 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	case "metric":
 		selectedUnits = unitsMetric
 		// Convert value from imperial to metric
-		convertedValue = convertToMetric(normalizedKey, value)
+		convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
 		// log.Printf("Debug: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
 	default:
 		// log.Printf("Warning: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
@@ -517,8 +525,8 @@ func loadConfig() (Config, error) {
 			SSL:      false,
 		},
 
-		UnitOfMeasurement: "metric",
-		// UnitOfMeasurement: "imperial",
+		UnitSystem: "metric",
+		// UnitSystem: "imperial",
 		Language: "en",
 	}
 
@@ -599,13 +607,13 @@ func loadConfig() (Config, error) {
 	}
 
 	if haUnits := os.Getenv("HA_UNITS"); haUnits != "" {
-		config.UnitOfMeasurement = strings.TrimSpace(haUnits)
+		config.UnitSystem = strings.TrimSpace(haUnits)
 	}
 
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
 	customLog("INFO", "Load variable language: '%s'", config.Language)
-	customLog("INFO", "Load variable unit of measurement: '%s'", config.UnitOfMeasurement)
+	customLog("INFO", "Load variable unit system: '%s'", config.UnitSystem)
 	return config, nil
 }
 
@@ -980,7 +988,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		value = strings.TrimSpace(value)
 
 		// log.Printf("Processing - key=%s, value=%s", key, value)
-		// log.Printf("UnitOfMeasurement=%s", config.UnitOfMeasurement)
+		// log.Printf("UnitSystem=%s", config.UnitSystem)
 		// log.Printf("Language=%s", config.Language)
 
 		status, deviceCl, unitOfMesure, localizedName, convertedValue, measurement := transformInput(key, value, config)

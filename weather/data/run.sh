@@ -3,7 +3,7 @@
 echo "Starting weather service..."
 
 export HA_LANGUAGE=${HA_LANGUAGE:-$(bashio::config 'language')}
-export HA_UNITS=${HA_UNITS:-$(bashio::config 'uof')}
+export HA_UNITS=${HA_UNITS:-$(bashio::config 'unit_system')}
 export MQTT_HOSTNAME=${MQTT_HOSTNAME:-$(bashio::info.hostname)}
 export MQTT_PASSWORD=${MQTT_PASSWORD:-$(bashio::config 'password')}
 export MQTT_PORT=${MQTT_PORT:-1883}

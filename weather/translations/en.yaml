@@ -1,7 +1,7 @@
 configuration:
-  uof:
-    name: "Units of Measurement"
-    description: "Controls the units of measurement for the app."
+  unit_system:
+    name: "Units System"
+    description: "Controls the units system for the app."
   language:
     name: "Language"
     description: "Controls the language of the units of measurement for the app."
