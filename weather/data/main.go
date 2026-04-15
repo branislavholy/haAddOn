@@ -320,6 +320,10 @@ var UnitsConfig = map[string]map[string]string{
 		"en": "Wind Chill temperature",
 		"sk": "Ochladzujúci účinok vetra",
 	},
+	"uvCategories": {
+		"en": "UV Categories",
+		"sk": "UV Categories",
+	},
 }
 
 // key=rtfreq, value=5
@@ -358,6 +362,7 @@ var unitsImperial = map[string]SensorConfig{
 	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
 	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
 	// Disabled sensors that are not relevant for HomeAssistant
 	"rtfreq":   {Status: "disabled", DeviceClass: "frequency", Unit: "s", Measurement: ""},
 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
@@ -366,13 +371,6 @@ var unitsImperial = map[string]SensorConfig{
 	"action":   {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
 	"realtime": {Status: "disabled", DeviceClass: "binary_sensor", Unit: "", Measurement: ""},
 }
-
-// TODO: The UV Index Scale
-// 0 – 2: Low
-// 3 – 5: Moderate
-// 6 – 7: High
-// 8 – 10: Very High
-// 11+: Extreme
 
 // unitsMetric defines all sensor types with their device classes and units (°C, km/h, hPa)
 var unitsMetric = map[string]SensorConfig{
@@ -391,6 +389,7 @@ var unitsMetric = map[string]SensorConfig{
 	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
 	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
 	// Disabled sensors that are not relevant for HomeAssistant
 	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Unit: "s", Measurement: ""},
 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
@@ -698,6 +697,32 @@ func calculateWindDirSite(windDir string) string {
 	}
 }
 
+// TODO: The UV Index Scale
+// 0 – 2: Low
+// 3 – 5: Moderate
+// 6 – 7: High
+// 8 – 10: Very High
+// 11+: Extreme
+func calculateUvCategories(uvValue string) string {
+	uvNormalize, err := strconv.ParseFloat(uvValue, 64)
+	if err != nil {
+		return "Invalid UV Value"
+	}
+
+	switch {
+	case uvNormalize >= 0 && uvNormalize <= 2:
+		return "Low"
+	case uvNormalize > 2 && uvNormalize <= 5:
+		return "Moderate"
+	case uvNormalize > 5 && uvNormalize <= 7:
+		return "High"
+	case uvNormalize > 7 && uvNormalize <= 10:
+		return "Very High"
+	default:
+		return "Extreme"
+	}
+}
+
 func mqttConnect(config Config) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 
@@ -970,6 +995,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	data["windchillf"] = calculateWindChill(data["tempf"], data["windspeedmph"])
 	data["winddir"] = calculateWinDir(data["winddir"])
 	data["winddirsite"] = calculateWindDirSite(data["winddir"])
+	data["uvcategories"] = calculateUvCategories(data["uv"])
 
 	// log.Printf("data: %s\n", data)
 	customLog("INFO", "Received data: %v", data)
