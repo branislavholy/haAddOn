@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/branislavholy/haAddOn/compare/v1.6.0...v1.6.1) (2026-04-15)
+
+
+### Bug Fixes
+
+* update uv categories ([92b652e](https://github.com/branislavholy/haAddOn/commit/92b652e99ac3a3771cc25add734afc3a2fdf831c))
+
 ## [1.6.0](https://github.com/branislavholy/haAddOn/compare/v1.5.28...v1.6.0) (2026-04-15)
 
 
