@@ -38,7 +38,7 @@ var currentLogLevelPriority int
 // }
 
 var (
-	version = "1.6.1" // x-release-please-version
+	version = "1.6.0" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -995,7 +995,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	data["windchillf"] = calculateWindChill(data["tempf"], data["windspeedmph"])
 	data["winddir"] = calculateWinDir(data["winddir"])
 	data["winddirsite"] = calculateWindDirSite(data["winddir"])
-	data["uvcategories"] = calculateUvCategories(data["uv"])
+	data["uvcategories"] = calculateUvCategories(data["UV"])
 
 	// log.Printf("data: %s\n", data)
 	customLog("INFO", "Received data: %v", data)
