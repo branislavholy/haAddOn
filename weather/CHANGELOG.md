@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.28](https://github.com/branislavholy/haAddOn/compare/v1.5.27...v1.5.28) (2026-04-15)
+
+
+### Bug Fixes
+
+* update unit system ([1554603](https://github.com/branislavholy/haAddOn/commit/1554603ce9aa54cb6aaf59117ad6fd89b48bc656))
+
 ## [1.5.27](https://github.com/branislavholy/haAddOn/compare/v1.5.26...v1.5.27) (2026-04-13)
 
 
