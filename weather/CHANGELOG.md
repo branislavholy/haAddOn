@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/branislavholy/haAddOn/compare/v1.5.28...v1.6.0) (2026-04-15)
+
+
+### Features
+
+* add uv categories ([3f97a52](https://github.com/branislavholy/haAddOn/commit/3f97a52d45b075f83719bc5410401f207e172675))
+
 ## [1.5.28](https://github.com/branislavholy/haAddOn/compare/v1.5.27...v1.5.28) (2026-04-15)
 
 
