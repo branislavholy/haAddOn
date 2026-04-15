@@ -320,7 +320,7 @@ var UnitsConfig = map[string]map[string]string{
 		"en": "Wind Chill temperature",
 		"sk": "Ochladzujúci účinok vetra",
 	},
-	"uvCategories": {
+	"uvcategories": {
 		"en": "UV Categories",
 		"sk": "UV Categories",
 	},
