@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.7.0](https://github.com/branislavholy/haAddOn/compare/v1.6.3...v1.7.0) (2026-04-16)
+
+
+### Features
+
+* add cz lokalization ([446688b](https://github.com/branislavholy/haAddOn/commit/446688bb3c32cac0acf7e28ea95852bf592f0295))
+
 ## [1.6.3](https://github.com/branislavholy/haAddOn/compare/v1.6.2...v1.6.3) (2026-04-16)
 
 
