@@ -38,7 +38,7 @@ var currentLogLevelPriority int
 // }
 
 var (
-	version = "1.6.2" // x-release-please-version
+	version = "1.6.0" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
@@ -322,7 +322,7 @@ var UnitsConfig = map[string]map[string]string{
 	},
 	"uvcategories": {
 		"en": "UV Categories",
-		"sk": "UV Categories",
+		"sk": "UV Kategória",
 	},
 }
 
@@ -992,10 +992,21 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		}
 	}
 
-	data["windchillf"] = calculateWindChill(data["tempf"], data["windspeedmph"])
-	data["winddir"] = calculateWinDir(data["winddir"])
-	data["winddirsite"] = calculateWindDirSite(data["winddir"])
-	data["uvcategories"] = calculateUvCategories(data["UV"])
+	if tempf, ok_t := data["tempf"]; ok_t {
+		if windSpeed, ok_w := data["windspeedmph"]; ok_w {
+			data["windchillf"] = calculateWindChill(tempf, windSpeed)
+		}
+	}
+
+	if windDir, ok := data["winddir"]; ok {
+		normWindDir := calculateWinDir(windDir)
+		data["winddir"] = normWindDir
+		data["winddirsite"] = calculateWindDirSite(normWindDir)
+	}
+
+	if uv, ok := data["UV"]; ok {
+		data["uvcategories"] = calculateUvCategories(uv)
+	}
 
 	// log.Printf("data: %s\n", data)
 	customLog("INFO", "Received data: %v", data)
