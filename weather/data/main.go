@@ -239,90 +239,112 @@ var UnitsConfig = map[string]map[string]string{
 	"tempf": {
 		"en": "Outdoor Temperature",
 		"sk": "Teplota vonkajšia",
+		"cz": "Teplota venkovní",
 	},
 	"indoortempf": {
 		"en": "Indoor Temperature",
 		"sk": "Teplota vnútorná",
+		"cz": "Teplota vnitřní",
 	},
 	"dewptf": {
 		"en": "Dew Point",
 		"sk": "Rosný bod",
+		"cz": "Rosný bod",
 	},
 	"humidity": {
 		"en": "Outdoor Humidity",
 		"sk": "Vlhkosť vonkajšia",
+		"cz": "Vlhkost venkovní",
 	},
 	"indoorhumidity": {
 		"en": "Indoor Humidity",
 		"sk": "Vlhkosť vnútorná",
+		"cz": "Vlhkost vnitřní",
 	},
 	"baromin": {
 		"en": "Barometric Pressure",
 		"sk": "Barometrický tlak",
+		"cz": "Barometrický tlak",
 	},
 	"windspeedmph": {
 		"en": "Average wind speed",
 		"sk": "Priemerná rýchlosť vetra",
+		"cz": "Průměrná rychlost větru",
 	},
 	"windgustmph": {
 		"en": "Maximum instantaneous wind speed",
 		"sk": "Maximálna okamžitá rýchlosť vetra",
+		"cz": "Maximální okamžitá rychlost větru",
 	},
 	"winddir": {
 		"en": "Wind Direction",
 		"sk": "Smer vetra",
+		"cz": "Směr větru",
 	},
 	"rainin": {
 		"en": "Hourly Rainfall",
 		"sk": "Intenzita dažďa hodinová",
+		"cz": "Intenzita deště hodinová",
 	},
 	"dailyrainin": {
 		"en": "Daily Rainfall",
 		"sk": "Denné zrážky",
+		"cz": "Denní srážky",
 	},
 	"solarradiation": {
 		"en": "Solar Radiation",
 		"sk": "Solárne žiarenie",
+		"cz": "Sluneční záření",
 	},
 	"uv": {
 		"en": "UV Index",
 		"sk": "UV Index",
+		"cz": "UV Index",
 	},
 	"rtfreq": {
 		"en": "Real-Time Frequency",
 		"sk": "Frekvencia aktualizácie v reálnom čase",
+		"cz": "Frekvence aktualizace v reálném čase",
 	},
 	"dateutc": {
 		"en": "Date/Time (UTC)",
 		"sk": "Dátum/čas (UTC)",
+		"cz": "Datum/čas (UTC)",
 	},
 	"id": {
 		"en": "Station ID",
 		"sk": "ID stanice",
+		"cz": "ID stanice",
 	},
 	"password": {
 		"en": "Station Key",
 		"sk": "Kľúč stanice",
+		"cz": "Klíč stanice",
 	},
 	"action": {
 		"en": "Action Type",
 		"sk": "Typ akcie",
+		"cz": "Typ akce",
 	},
 	"realtime": {
 		"en": "Real-Time Data Status",
 		"sk": "Stav dát v reálnom čase",
+		"cz": "Stav dat v reálném čase",
 	},
 	"winddirsite": {
 		"en": "Site-Specific Wind Direction",
 		"sk": "Smer vetra",
+		"cz": "Směr větru",
 	},
 	"windchillf": {
 		"en": "Wind Chill temperature",
 		"sk": "Ochladzujúci účinok vetra",
+		"cz": "Teplota větru",
 	},
 	"uvcategories": {
 		"en": "UV Categories",
 		"sk": "UV Kategória",
+		"cz": "UV Kategorie",
 	},
 }
 
