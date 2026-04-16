@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/branislavholy/haAddOn/compare/v1.6.2...v1.6.3) (2026-04-16)
+
+
+### Bug Fixes
+
+* validate calculated params ([a908f5c](https://github.com/branislavholy/haAddOn/commit/a908f5c6e133908e3a3052a911c8a54305d5bd9f))
+
 ## [1.6.2](https://github.com/branislavholy/haAddOn/compare/v1.6.1...v1.6.2) (2026-04-15)
 
 
