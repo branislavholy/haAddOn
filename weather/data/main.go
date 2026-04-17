@@ -32,7 +32,7 @@ var registeredTopics sync.Map
 var currentLogLevelPriority int
 
 var (
-	version = "1.7.1" // x-release-please-version
+	version = "1.7.2" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
 	date   = "unknown"
