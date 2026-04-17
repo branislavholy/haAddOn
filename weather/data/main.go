@@ -991,7 +991,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	// Fill the default values for HomeAssistant Origin MQTT config
 	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
 	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
-	customLog("DEBUG", "Default Origin: %+v", homeAssistantOrigin)
+	customLog("DEBUG", "Origin payload: '%+v'", homeAssistantOrigin)
 
 	// Fill the default values for HomeAssistant Device MQTT config
 	homeAssistantDevice := FillDefaultHomeAssistantDevice()
@@ -1005,7 +1005,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	modelName, modelVersion := GetDeviceModelINFO(stationId)
 	homeAssistantDevice.Model = strings.ToUpper(modelName)
 	homeAssistantDevice.HwVersion = modelVersion
-	customLog("DEBUG", "Station device ID: %+v", homeAssistantDevice)
+	customLog("DEBUG", "Device payload: '%+v'", homeAssistantDevice)
 
 	if tempf, ok_t := data["tempf"]; ok_t {
 		if windSpeed, ok_w := data["windspeedmph"]; ok_w {
