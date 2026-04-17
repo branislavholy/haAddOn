@@ -13,7 +13,7 @@ configuration:
     description: "The password for the MQTT service API."
   port:
     name: "MQTT Port"
-    description: " The port for the MQTT service API."
+    description: "The port for the MQTT service API."
   hostname:
     name: "MQTT Host"
-    description: "The hostname for the MQTT service API. If left empty, the default Home Assistant hostname will be used."
+    description: "The hostname for the MQTT service API. If left empty, the default 'homeassistant' hostname will be used."

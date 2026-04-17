@@ -31,12 +31,6 @@ var registeredTopics sync.Map
 
 var currentLogLevelPriority int
 
-// var mqttMsgChan = make(chan mqtt.Message)
-
-// var messagePubHandler mqtt.MessageHandler = func(client mqtt.Client, msg mqtt.Message) {
-// 	mqttMsgChan <- msg
-// }
-
 var (
 	version = "1.7.0" // x-release-please-version
 	// Define by GoReleaser
@@ -44,7 +38,7 @@ var (
 	date   = "unknown"
 	binary = "none"
 
-	githubUrl = "https://github.com/branislavholy/haAddOn/ha-addon"
+	githubUrl = "https://github.com/branislavholy/haAddOn"
 
 	// Do not change this variable.
 	// It is define device in a HomeAssistant
@@ -55,11 +49,6 @@ var (
 	Id           = "garni2055"
 	undefined    = "undefined"
 	UniqIdPrefix = "sensor_"
-
-	// mock start
-	// tempf        = 33.0
-	// windspeedmph = 2.6
-	// mock end
 )
 
 // Define a struct that matches your config.yaml options
@@ -975,23 +964,8 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
 	var sensors []HomeAssistantConfig
-
-	// Fill the default values for HomeAssistant Origin MQTT config
-	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
-	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
-	customLog("DEBUG", "Default Origin: %+v", homeAssistantOrigin)
-
-	// Fill the default values for HomeAssistant Device MQTT config
-	homeAssistantDevice := FillDefaultHomeAssistantDevice()
-	homeAssistantDevice.ModeId = Id
-
-	modelName, modelVersion := GetDeviceModelINFO(Id)
-	homeAssistantDevice.Model = strings.ToUpper(modelName)
-	homeAssistantDevice.HwVersion = modelVersion
-	// log.Printf("Default Device: %+v", homeAssistantDevice)
-	customLog("DEBUG", "Default Device: %+v", homeAssistantDevice)
-
 	var data = make(map[string]string)
+
 	if err := r.ParseForm(); err != nil {
 		customLog("ERROR", "Message: %v", err)
 		return
@@ -1013,6 +987,25 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 			data[key] = val
 		}
 	}
+
+	// Fill the default values for HomeAssistant Origin MQTT config
+	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
+	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
+	customLog("DEBUG", "Default Origin: %+v", homeAssistantOrigin)
+
+	// Fill the default values for HomeAssistant Device MQTT config
+	homeAssistantDevice := FillDefaultHomeAssistantDevice()
+
+	stationId := Id
+	if stationPayloadId, ok := data["ID"]; ok {
+		stationId = stationPayloadId
+	}
+	homeAssistantDevice.ModeId = stationId
+
+	modelName, modelVersion := GetDeviceModelINFO(stationId)
+	homeAssistantDevice.Model = strings.ToUpper(modelName)
+	homeAssistantDevice.HwVersion = modelVersion
+	customLog("DEBUG", "Station device ID: %+v", homeAssistantDevice)
 
 	if tempf, ok_t := data["tempf"]; ok_t {
 		if windSpeed, ok_w := data["windspeedmph"]; ok_w {

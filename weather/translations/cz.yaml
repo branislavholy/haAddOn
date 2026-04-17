@@ -1,0 +1,19 @@
+configuration:
+  unit_system:
+    name: "Systém jednotek"
+    description: "Definuje systém jednotek pro aplikaci."
+  language:
+    name: "Jazyk"
+    description: "Definuje jazyk meraných jednotek pro aplikaci."
+  username:
+    name: "MQTT Jméno"
+    description: "Uživatelské jméno pro MQTT servis API."
+  password:
+    name: "MQTT Heslo"
+    description: "Uživatelské heslo pro MQTT servis API."
+  port:
+    name: "MQTT Port"
+    description: "Port pro MQTT servis API."
+  hostname:
+    name: "MQTT Server"
+    description: "Název serveru pro MQTT servis API. Pokud zůstane prázdný, bude použit výchozí název hostitele 'homeassistant'."

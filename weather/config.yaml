@@ -19,7 +19,7 @@ options:
   password: ''
   log_level: info
 schema:
-  language: list(en|sk)
+  language: list(en|sk|cz)
   unit_system: list(metric|imperial)
   hostname: str?
   port: int?
