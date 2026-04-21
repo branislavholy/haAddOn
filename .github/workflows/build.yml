@@ -27,8 +27,8 @@ jobs:
         id: release
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
-          draft: true
-          # release-type: go
+          # draft: true
+          release-type: go
 
       - uses: actions/checkout@v6
         # if: ${{ steps.release.outputs.release_created }}
