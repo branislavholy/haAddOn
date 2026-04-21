@@ -21,10 +21,10 @@ const (
 	// clientID    = "go-mqtt-subscriber"
 	topic       = "homeassistant/sensor/weather/state"
 	ColorReset  = "\033[0m"
-	ColorCyan   = "\033[36m" // Debug
-	ColorGreen  = "\033[32m" // Info
-	ColorYellow = "\033[33m" // Warning
-	ColorRed    = "\033[31m" // Error
+	ColorCyan   = "\033[36m"       // Debug
+	ColorGreen  = "\033[32m"       // Info
+	ColorYellow = "\033[33m"       // Warning
+	ColorRed    = "\033[38;5;210m" // Error
 )
 
 // Global map for safely tracking registered topics

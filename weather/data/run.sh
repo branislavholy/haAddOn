@@ -2,7 +2,7 @@
 
 echo "Starting weather service..."
 
-export USER_LANGUAGE=$(bashio::api.supervisor GET "/core/api/config" | bashio::jq ".language")
+export USER_LANGUAGE="$(bashio::info.language)"
 
 bashio::log.info "Loaded user language: '$USER_LANGUAGE'"
 
