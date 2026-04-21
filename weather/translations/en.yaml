@@ -17,3 +17,18 @@ configuration:
   hostname:
     name: "MQTT Host"
     description: "The hostname for the MQTT service API. If left empty, the default 'homeassistant' hostname will be used."
+  temperature:
+    name: "Temperature Unit"
+    description: "The unit for temperature measurements."
+  precipitation:
+    name: "Precipitation Unit"
+    description: "The unit for precipitation measurements."
+  pressure:
+    name: "Pressure Unit"
+    description: "The unit for pressure measurements."
+  speed:
+    name: "Speed Unit"
+    description: "The unit for speed measurements."
+  log_level:
+    name: "Log Level"
+    description: "The log level for the add-on."

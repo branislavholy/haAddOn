@@ -17,3 +17,18 @@ configuration:
   hostname:
     name: "MQTT Server"
     description: "Názov serveru pre MQTT servis API. Ak zostane prázdny, bude použitý predvolený názov hostiteľa 'homeassistant'."
+  temperature:
+    name: "Jednotka teploty"
+    description: "Jednotka pre meranie teploty."
+  precipitation:
+    name: "Jednotka zrážok"
+    description: "Jednotka pre meranie zrážok."
+  pressure:
+    name: "Jednotka tlaku"
+    description: "Jednotka pre meranie tlaku."
+  speed:
+    name: "Jednotka rýchlosti"
+    description: "Jednotka pre meranie rýchlosti."
+  log_level:
+    name: "Úroveň logovania"
+    description: "Úroveň logovania pre aplikáciu."

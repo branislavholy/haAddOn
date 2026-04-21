@@ -32,4 +32,4 @@ schema:
   port: int?
   username: str
   password: password
-  log_level: list(debug|info|error|warning|critical|none|silent|fatal)
+  log_level: list(debug|info|error|warning)

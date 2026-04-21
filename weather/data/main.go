@@ -203,7 +203,7 @@ func customLog(level string, format string, v ...any) {
 	case "DEBUG":
 		color = ColorCyan
 	case "INFO":
-		color = ColorGreen
+		color = ColorReset
 	case "WARN":
 		color = ColorYellow
 	case "ERROR":
