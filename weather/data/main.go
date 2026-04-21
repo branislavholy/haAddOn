@@ -24,6 +24,7 @@ const (
 	ColorCyan   = "\033[36m" // Debug
 	ColorGreen  = "\033[32m" // Info
 	ColorYellow = "\033[33m" // Warning
+	ColorRed    = "\033[31m" // Error
 )
 
 // Global map for safely tracking registered topics
@@ -38,7 +39,7 @@ var (
 	date   = "unknown"
 	binary = "none"
 
-	githubUrl = "https://github.com/branislavholy/haAddOn"
+	githubUrl = "https://github.com/branislavholy"
 
 	// Do not change this variable.
 	// It is define device in a HomeAssistant
@@ -199,12 +200,14 @@ func customLog(level string, format string, v ...any) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
 	switch level {
-	case "Debug":
+	case "DEBUG":
 		color = ColorCyan
-	case "Info":
+	case "INFO":
 		color = ColorGreen
-	case "Warning":
+	case "WARN":
 		color = ColorYellow
+	case "ERROR":
+		color = ColorRed
 	default:
 		color = ColorReset
 	}
@@ -226,14 +229,14 @@ type SensorConfig struct {
 // UnitsConfig provides localized names for sensor types
 var UnitsConfig = map[string]map[string]string{
 	"tempf": {
-		"en": "Outdoor Temperature",
-		"sk": "Teplota vonkajšia",
-		"cz": "Teplota venkovní",
+		"en": "Outdoor temperature",
+		"sk": "Vonkajšia teplota ",
+		"cz": "Venkovní Teplota",
 	},
 	"indoortempf": {
-		"en": "Indoor Temperature",
-		"sk": "Teplota vnútorná",
-		"cz": "Teplota vnitřní",
+		"en": "Temperature indoor",
+		"sk": "Vnútorná teplota ",
+		"cz": "Vnitřní teplota",
 	},
 	"dewptf": {
 		"en": "Dew Point",
@@ -241,14 +244,14 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Rosný bod",
 	},
 	"humidity": {
-		"en": "Outdoor Humidity",
-		"sk": "Vlhkosť vonkajšia",
-		"cz": "Vlhkost venkovní",
+		"en": "Outdoor humidity",
+		"sk": "Vonkajšia vlhkosť ",
+		"cz": "Venkovní vlhkost ",
 	},
 	"indoorhumidity": {
 		"en": "Indoor Humidity",
-		"sk": "Vlhkosť vnútorná",
-		"cz": "Vlhkost vnitřní",
+		"sk": "Vnútorná vlhkosť",
+		"cz": "Vnitřní vlhkost",
 	},
 	"baromin": {
 		"en": "Barometric Pressure",
@@ -256,14 +259,14 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Barometrický tlak",
 	},
 	"windspeedmph": {
-		"en": "Average wind speed",
-		"sk": "Priemerná rýchlosť vetra",
-		"cz": "Průměrná rychlost větru",
+		"en": "Wind speed average ",
+		"sk": "Rýchlosť vetra priemerná ",
+		"cz": "Rychlost větru průměrná ",
 	},
 	"windgustmph": {
-		"en": "Maximum instantaneous wind speed",
-		"sk": "Maximálna okamžitá rýchlosť vetra",
-		"cz": "Maximální okamžitá rychlost větru",
+		"en": "Wind speed maximum instantaneous",
+		"sk": "Rýchlosť vetra maximálna okamžitá ",
+		"cz": "Rychlost větru maximální okamžitá ",
 	},
 	"winddir": {
 		"en": "Wind Direction",
@@ -271,14 +274,14 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Směr větru",
 	},
 	"rainin": {
-		"en": "Hourly Rainfall",
-		"sk": "Intenzita dažďa hodinová",
-		"cz": "Intenzita deště hodinová",
+		"en": "Rainfall hourly",
+		"sk": "Zrážky intenzita dažďa hodinová",
+		"cz": "Srážky intenzita deště hodinová",
 	},
 	"dailyrainin": {
-		"en": "Daily Rainfall",
-		"sk": "Denné zrážky",
-		"cz": "Denní srážky",
+		"en": "Rainfall daily",
+		"sk": "Zrážky denné",
+		"cz": "Srážky denní",
 	},
 	"solarradiation": {
 		"en": "Solar Radiation",
@@ -311,24 +314,24 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Klíč stanice",
 	},
 	"action": {
-		"en": "Action Type",
+		"en": "Action type",
 		"sk": "Typ akcie",
 		"cz": "Typ akce",
 	},
 	"realtime": {
-		"en": "Real-Time Data Status",
+		"en": "Real-Time data status",
 		"sk": "Stav dát v reálnom čase",
 		"cz": "Stav dat v reálném čase",
 	},
 	"winddirsite": {
-		"en": "Site-Specific Wind Direction",
-		"sk": "Smer vetra",
-		"cz": "Směr větru",
+		"en": "Wind Direction site-specific ",
+		"sk": "Smer vetra zemepisný",
+		"cz": "Směr větru zeměpisný",
 	},
 	"windchillf": {
-		"en": "Wind Chill temperature",
-		"sk": "Ochladzujúci účinok vetra",
-		"cz": "Teplota větru",
+		"en": "Temperature wind chill",
+		"sk": "Teplota ochladzujúci účinok vetrom",
+		"cz": "Teplota ochlazující účinek větrem",
 	},
 	"uvcategories": {
 		"en": "UV Categories",
@@ -356,6 +359,58 @@ var UnitsConfig = map[string]map[string]string{
 
 // {"ID":"garni2055","PASSWORD":"garni2055","UV":"0.0","action":"updateraww","dateutc":"2026-03-23T21:01:40Z","dewPoint":1.78,"humidity":"55","humidityIndoor":"60","pressure":1012.08,"rainDailymm":0,"rainmm":0,"realtime":"1","rtfreq":"5","solarradiation":"0.0","temperature":10.56,"temperatureIndoor":19.78,"windChill":2.08,"windDirSite":"SW|JZ","windGustms":0.89,"windSpeedms":0.89,"winddir":"221"}
 
+// var entityUnit = map[string]string{
+// 	"_default":       "",
+// 	"duration":       "s",
+// 	"humidity":       "%",
+// 	"illuminance":    "lx",
+// 	"precipitation":  "mm",
+// 	"pressure":       "hPa",
+// 	"temperature":    "°C",
+// 	"timestamp":      "",
+// 	"wind_direction": "°",
+// 	"wind_speed":     "m/s",
+// }
+
+// var entityUnitSource = map[string]string{
+// 	"_default":       "",
+// 	"duration":       "s",
+// 	"humidity":       "%",
+// 	"illuminance":    "lx",
+// 	"precipitation":  "in",   // mm, in
+// 	"pressure":       "inHg", // hPa, mbar, mmHg, inHg
+// 	"temperature":    "°F",   // °C, °F
+// 	"timestamp":      "",
+// 	"wind_direction": "°",
+// 	"wind_speed":     "mph", //	m/s, km/h, mph, kn
+// }
+
+// var unitsSystemConfig = map[string]SensorConfig{
+// 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+// 	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+// 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+// 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Measurement: "measurement"},             // Unit: "%",
+// 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Measurement: "measurement"},             // Unit: "%",
+// 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Measurement: "measurement"},             // Unit: "hPa",
+// 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Measurement: "measurement"},           // Unit: "m/s", km/h, suggested_unit_of_measurement
+// 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Measurement: "measurement"},           // Unit: "m/s", km/h,  suggested_unit_of_measurement
+// 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Measurement: "measurement_angle"}, // Unit: "°",
+// 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Measurement: "measurement"},        // Unit: "mm",
+// 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Measurement: "measurement"},        // Unit: "mm",
+// 	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Measurement: "measurement"},          // Unit: "lx",
+// 	"uv":             {Status: "enabled", DeviceClass: "", Measurement: "measurement"},                     // Unit: "",
+// 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+// 	"winddirsite":    {Status: "enabled", DeviceClass: "", Measurement: ""},                                // Unit: "",
+// 	"uvcategories":   {Status: "enabled", DeviceClass: "", Measurement: ""},
+// 	// Disabled sensors that are not relevant for HomeAssistant
+// 	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Measurement: ""},  // Unit: "s",
+// 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Measurement: ""}, // Unit: "",
+// 	"id":       {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+// 	"password": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+// 	"action":   {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+// 	"realtime": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+// }
+
 // unitsImperial defines all sensor types with their device classes and units (°F, mph, inHg)
 var unitsImperial = map[string]SensorConfig{
 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
@@ -363,7 +418,7 @@ var unitsImperial = map[string]SensorConfig{
 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "inHg", Measurement: "measurement"},
+	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "in", Measurement: "measurement"},
 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
@@ -429,10 +484,10 @@ func convertToMetric(key, value string, unit string) string {
 	// Parse value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		// log.Printf("Warning: Failed to parse value %q for key %q, using original", value, key)
+		// log.Printf("WARN: Failed to parse value %q for key %q, using original", value, key)
 		return value
 	}
-	// log.Printf("Info: Parsed value %q for key %q, using original", value, key)
+	// log.Printf("INFO: Parsed value %q for key %q, using original", value, key)
 
 	var converted float64
 	switch key {
@@ -449,7 +504,7 @@ func convertToMetric(key, value string, unit string) string {
 			converted = val * 0.44704
 		}
 	case "baromin":
-		// inHg to hPa
+		// in to hPa
 		converted = val * 33.8639
 	case "rainin", "dailyrainin":
 		// inches to mm
@@ -484,8 +539,8 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 		convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
 		// log.Printf("Debug: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
 	default:
-		// log.Printf("Warning: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
-		customLog("Warning", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
+		// log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
+		customLog("WARN", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
 		// selectedUnits = unitsImperial
 		return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
 	}
@@ -544,7 +599,7 @@ func loadConfig() (Config, error) {
 	// file, err := os.ReadFile(configPath)
 	// if err != nil {
 	// 	if os.IsNotExist(err) {
-	// 		log.Printf("Warning: Config file not found at %s, using defaults", configPath)
+	// 		log.Printf("WARN: Config file not found at %s, using defaults", configPath)
 	// 	} else {
 	// 		log.Printf("ERROR: Failed to read config file: %v, using defaults", err)
 	// 	}
@@ -642,8 +697,8 @@ func calculateWinDir(windDir string) string {
 	// Normalize wind direction to 0-360 range
 	val, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		// log.Printf("Warning: Failed to parse wind direction %q, using original", windDir)
-		customLog("Warning", "Failed to parse wind direction %q, using original", windDir)
+		// log.Printf("WARN: Failed to parse wind direction %q, using original", windDir)
+		customLog("WARN", "Failed to parse wind direction %q, using original", windDir)
 		return windDir
 	}
 
@@ -664,8 +719,8 @@ func calculateWindDirSite(windDir string) string {
 	// Parse wind direction to float64
 	value, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		// log.Printf("Warning: Failed to parse wind direction %q, using N|S", windDir)
-		customLog("Warning", "Failed to parse wind direction %q, using N|S", windDir)
+		// log.Printf("WARN: Failed to parse wind direction %q, using N|S", windDir)
+		customLog("WARN", "Failed to parse wind direction %q, using N|S", windDir)
 		return "N|S"
 	}
 
@@ -942,18 +997,18 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 			}
 
 			// Publish discovery message with QoS 1 and Retain flag set to true
-			customLog("INFO", "Registering new sensor: %s", sensorID)
+			customLog("INFO", "Registering new sensor: '%s'", sensorID)
 			token := client.Publish(topic, 1, true, payload)
 
 			// Wait for broker acknowledgment and store success in the local map
 			if token.Wait() && token.Error() == nil {
 				registeredTopics.Store(topic, true)
-				customLog("INFO", "Sensor %s successfully registered.", sensorID)
+				customLog("INFO", "Sensor '%s' successfully registered.", sensorID)
 				// ADD THIS DELAY: Give Mosquitto 100ms to breathe between sensors
 				// This prevents the "flood" that causes the EOF disconnect.
 				time.Sleep(100 * time.Millisecond)
 			} else {
-				customLog("ERROR", "Registration failed for %s: %v", sensorID, token.Error())
+				customLog("ERROR", "Registration failed for '%s': %v", sensorID, token.Error())
 			}
 		}(itemSenzor)
 	}
@@ -973,15 +1028,15 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte("success")); err != nil {
-		customLog("Warning", "Failed to write response to station: %v", err)
+		customLog("WARN", "Failed to write response to station: %v", err)
 	}
 
 	for key, values := range r.Form {
 		for _, val := range values {
 			// Skip empty entries
 			if key == "" || val == "" {
-				// log.Printf("Warning: Skipping empty key or value - key=%q, value=%q", key, val)
-				customLog("Warning", "Skipping empty key or value - key=%q, value=%q", key, val)
+				// log.Printf("WARN: Skipping empty key or value - key=%q, value=%q", key, val)
+				customLog("WARN", "Skipping empty key or value - key=%q, value=%q", key, val)
 				continue
 			}
 			data[key] = val
@@ -1024,14 +1079,14 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	}
 
 	// log.Printf("data: %s\n", data)
-	customLog("INFO", "Received data: %v", data)
+	customLog("DEBUG", "Received original map data: %v", data)
 
 	jsonOriginalData, err := json.Marshal(data)
 	if err != nil {
 		customLog("ERROR", "Message: %v", err)
 		return
 	}
-	customLog("DEBUG", "Original data: '%s'", jsonOriginalData)
+	customLog("DEBUG", "Received original json payload: '%s'", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
@@ -1081,7 +1136,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("ERROR", "Message: %v", err)
 		return
 	}
-	customLog("INFO", "Converted data: '%s'", jsonData)
+	customLog("INFO", "Converted json payload: '%s'", jsonData)
 	// payload, err := json.MarshalIndent(sensors, "", "  ")
 
 	// Correct logging

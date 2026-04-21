@@ -10,7 +10,11 @@ arch:
 ports:
   80/tcp: 80
 options:
-  language: en
+  language: auto
+  temperature: "°C"
+  precipitation: "mm"
+  pressure: "hPa"
+  speed: "m/s"
   unit_system: metric
   hostname: ''
   port: 1883
@@ -18,10 +22,14 @@ options:
   password: ''
   log_level: info
 schema:
-  language: list(en|sk|cz)
+  language: list(auto|en|sk|cz)
+  temperature: list(°C|°F)
+  precipitation: list(mm|in)
+  pressure: list(hPa|mbar|mmHg|inHg)
+  speed: list(m/s|km/h|mph|kn)
   unit_system: list(metric|imperial)
   hostname: str?
   port: int?
   username: str
   password: password
-  log_level: list(debug|info|error)
+  log_level: list(debug|info|error|warning|critical|none|silent|fatal)

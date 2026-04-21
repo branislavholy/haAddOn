@@ -2,6 +2,10 @@
 
 echo "Starting weather service..."
 
+export USER_LANGUAGE="$(bashio::user.language)"
+
+bashio::log.info "Loaded user language: '$USER_LANGUAGE'"
+
 export HA_LANGUAGE=${HA_LANGUAGE:-$(bashio::config 'language')}
 export HA_UNITS=${HA_UNITS:-$(bashio::config 'unit_system')}
 export MQTT_HOSTNAME=${MQTT_HOSTNAME:-$(bashio::info.hostname)}
