@@ -37,8 +37,8 @@ var (
 	version = "1.7.7" // x-release-please-version
 	// Define by GoReleaser
 	commit = "none"
-	date   = "unknown"
 	binary = "none"
+	date   = "unknown"
 
 	githubUrl = "https://github.com/branislavholy"
 
