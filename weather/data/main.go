@@ -28,6 +28,7 @@ const (
 )
 
 // Global map for safely tracking registered topics
+
 var registeredTopics sync.Map
 
 var currentLogLevelPriority int
