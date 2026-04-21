@@ -20,4 +20,4 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
           draft: true
-          release-type: go
+          # release-type: go
