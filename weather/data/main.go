@@ -28,11 +28,11 @@ const (
 )
 
 // Global map for safely tracking registered topics
-
 var registeredTopics sync.Map
 
 var currentLogLevelPriority int
 
+// define default variables
 var (
 	version = "1.7.6" // x-release-please-version
 	// Define by GoReleaser
