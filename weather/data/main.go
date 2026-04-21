@@ -47,8 +47,8 @@ var (
 	// echo -n "weatherG" | hexdump -ve '1/1 "%02x"' | sed 's/^/0x/'
 	hexaDumpName = "0x7765617468657247"
 
-	topicConfig  = "homeassistant/sensor/weather/%s/config"
 	Id           = "garni2055"
+	topicConfig  = "homeassistant/sensor/weather/%s/config"
 	UniqIdPrefix = "sensor_"
 	undefined    = "undefined"
 )
