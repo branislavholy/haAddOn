@@ -36,8 +36,8 @@ var currentLogLevelPriority int
 var (
 	version = "1.7.7" // x-release-please-version
 	// Define by GoReleaser
-	commit = "none"
 	date   = "unknown"
+	commit = "none"
 	binary = "none"
 
 	githubUrl = "https://github.com/branislavholy"
