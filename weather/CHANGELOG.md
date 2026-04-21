@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.7.11](https://github.com/branislavholy/haAddOn/compare/v1.7.10...v1.7.11) (2026-04-21)
+
+
+### Bug Fixes
+
+* improve stability ([decbf9c](https://github.com/branislavholy/haAddOn/commit/decbf9cf2084b0c0c47080b70ff766b56130590f))
+* improve stability ([b75c920](https://github.com/branislavholy/haAddOn/commit/b75c9200c47aaa5a446daaaeaa4be3e9aa0a07cd))
+* improve stability ([cbca7e3](https://github.com/branislavholy/haAddOn/commit/cbca7e30e88c89c7541bdee812edee0400f0dff4))
+
 ## [1.7.9](https://github.com/branislavholy/haAddOn/compare/v1.7.8...v1.7.9) (2026-04-21)
 
 
