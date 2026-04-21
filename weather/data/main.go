@@ -49,8 +49,8 @@ var (
 
 	topicConfig  = "homeassistant/sensor/weather/%s/config"
 	Id           = "garni2055"
-	undefined    = "undefined"
 	UniqIdPrefix = "sensor_"
+	undefined    = "undefined"
 )
 
 // Define a struct that matches your config.yaml options
