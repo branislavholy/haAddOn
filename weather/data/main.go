@@ -210,13 +210,13 @@ func customLog(level string, format string, v ...any) {
 // UnitsConfig provides localized names for sensor types
 var UnitsConfig = map[string]map[string]string{
 	"tempf": {
-		"en": "Outdoor temperature",
-		"sk": "Vonkajšia teplota ",
+		"en": "Temperature Outdoor",
+		"sk": "Vonkajšia teplota",
 		"cz": "Venkovní Teplota",
 	},
 	"indoortempf": {
 		"en": "Temperature indoor",
-		"sk": "Vnútorná teplota ",
+		"sk": "Vnútorná teplota",
 		"cz": "Vnitřní teplota",
 	},
 	"dewptf": {
@@ -225,12 +225,12 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Rosný bod",
 	},
 	"humidity": {
-		"en": "Outdoor humidity",
-		"sk": "Vonkajšia vlhkosť ",
-		"cz": "Venkovní vlhkost ",
+		"en": "Humidity outdoor",
+		"sk": "Vonkajšia vlhkosť",
+		"cz": "Venkovní vlhkost",
 	},
 	"indoorhumidity": {
-		"en": "Indoor Humidity",
+		"en": "Humidity indoor",
 		"sk": "Vnútorná vlhkosť",
 		"cz": "Vnitřní vlhkost",
 	},
@@ -240,14 +240,14 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Barometrický tlak",
 	},
 	"windspeedmph": {
-		"en": "Wind speed average ",
-		"sk": "Rýchlosť vetra priemerná ",
-		"cz": "Rychlost větru průměrná ",
+		"en": "Wind speed average",
+		"sk": "Rýchlosť vetra priemerná",
+		"cz": "Rychlost větru průměrná",
 	},
 	"windgustmph": {
 		"en": "Wind speed maximum instantaneous",
-		"sk": "Rýchlosť vetra maximálna okamžitá ",
-		"cz": "Rychlost větru maximální okamžitá ",
+		"sk": "Rýchlosť vetra maximálna okamžitá",
+		"cz": "Rychlost větru maximální okamžitá",
 	},
 	"winddir": {
 		"en": "Wind Direction",
@@ -305,7 +305,7 @@ var UnitsConfig = map[string]map[string]string{
 		"cz": "Stav dat v reálném čase",
 	},
 	"winddirsite": {
-		"en": "Wind Direction site-specific ",
+		"en": "Wind Direction site-specific",
 		"sk": "Smer vetra zemepisný",
 		"cz": "Směr větru zeměpisný",
 	},
