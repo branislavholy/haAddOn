@@ -36,7 +36,7 @@ var currentLogLevelPriority int
 
 // define default variables
 var (
-	version = "1.7.11" // x-release-please-version
+	version = "1.8.0" // x-release-please-version
 	// Define by GoReleaser
 	date   = "unknown"
 	commit = "none"

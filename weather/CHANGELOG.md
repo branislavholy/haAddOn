@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.0](https://github.com/branislavholy/haAddOn/compare/v1.7.11...v1.8.0) (2026-04-23)
+
+
+### Features
+
+* change units ([8d9a611](https://github.com/branislavholy/haAddOn/commit/8d9a611bcee907ac8bdafb1ae1a258b78b230001))
+
 ## [1.7.11](https://github.com/branislavholy/haAddOn/compare/v1.7.10...v1.7.11) (2026-04-21)
 
 
