@@ -36,7 +36,7 @@ var currentLogLevelPriority int
 
 // define default variables
 var (
-	version = "1.8.2" // x-release-please-version
+	version = "1.8.1" // x-release-please-version
 	// Define by GoReleaser
 	date   = "unknown"
 	commit = "none"
@@ -354,22 +354,22 @@ var UnitsConfig = map[string]map[string]string{
 // }
 
 type UnitSource struct {
-	deviceClass string
-	defaultUnit string
-	haInputUnit string
+	DeviceClass string
+	DefaultUnit string
+	HaInputUnit string
 }
 
 var entityUnitSource = map[string]UnitSource{
-	"duration":       {deviceClass: "duration", defaultUnit: "s", haInputUnit: ""},
-	"humidity":       {deviceClass: "humidity", defaultUnit: "%", haInputUnit: ""},
-	"illuminance":    {deviceClass: "illuminance", defaultUnit: "lx", haInputUnit: ""},
-	"precipitation":  {deviceClass: "precipitation", defaultUnit: "in", haInputUnit: "UnitPrecipitation"},
-	"pressure":       {deviceClass: "pressure", defaultUnit: "inHg", haInputUnit: "UnitPressure"},
-	"temperature":    {deviceClass: "temperature", defaultUnit: "°F", haInputUnit: "UnitTemperature"},
-	"timestamp":      {deviceClass: "timestamp", defaultUnit: "", haInputUnit: ""},
-	"wind_direction": {deviceClass: "wind_direction", defaultUnit: "°", haInputUnit: ""},
-	"wind_speed":     {deviceClass: "wind_speed", defaultUnit: "mph", haInputUnit: "UnitSpeed"},
-	"":               {deviceClass: "", defaultUnit: "", haInputUnit: ""},
+	"duration":       {DeviceClass: "duration", DefaultUnit: "s", HaInputUnit: ""},
+	"humidity":       {DeviceClass: "humidity", DefaultUnit: "%", HaInputUnit: ""},
+	"illuminance":    {DeviceClass: "illuminance", DefaultUnit: "lx", HaInputUnit: ""},
+	"precipitation":  {DeviceClass: "precipitation", DefaultUnit: "in", HaInputUnit: "UnitPrecipitation"},
+	"pressure":       {DeviceClass: "pressure", DefaultUnit: "inHg", HaInputUnit: "UnitPressure"},
+	"temperature":    {DeviceClass: "temperature", DefaultUnit: "°F", HaInputUnit: "UnitTemperature"},
+	"timestamp":      {DeviceClass: "timestamp", DefaultUnit: "", HaInputUnit: ""},
+	"wind_direction": {DeviceClass: "wind_direction", DefaultUnit: "°", HaInputUnit: ""},
+	"wind_speed":     {DeviceClass: "wind_speed", DefaultUnit: "mph", HaInputUnit: "UnitSpeed"},
+	"":               {DeviceClass: "", DefaultUnit: "", HaInputUnit: ""},
 }
 
 // // Default units for imperial system, input in request
@@ -496,7 +496,7 @@ var defaultSensorConfig = SensorConfig{
 }
 
 // convertToMetric converts imperial values to metric for specific sensor types
-func convertUnitValue(key, value string, defaultUnit string, convertToUnit string) string {
+func convertUnitValue(key, value string, DefaultUnit string, convertToUnit string) string {
 	// Transform string value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
@@ -505,12 +505,12 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	}
 
 	// If the default unit is the same as the desired unit, return the original value
-	if defaultUnit == convertToUnit {
+	if DefaultUnit == convertToUnit {
 		return value
 	}
 
 	// Use go-units library to find the input units
-	from, errFrom := u.Find(defaultUnit)
+	from, errFrom := u.Find(DefaultUnit)
 	to, errTo := u.Find(convertToUnit)
 	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", from, to, key, value)
 
@@ -560,7 +560,7 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 }
 
 // transformInput maps sensor keys to appropriate HomeAssistant device classes and units
-func transformInput(key, value string, config Config) (status, deviceClass, unit, localizedName, convertedValue, measurement string) {
+func transformInput(key, value string, config Config) (status, DeviceClass, unit, localizedName, convertedValue, measurement string) {
 	// Convert key to lowercase for case-insensitive lookup
 	normalizedKey := strings.ToLower(strings.TrimSpace(key))
 	// normalizedUnitsType := strings.ToLower(strings.TrimSpace(config.UnitSystem))
@@ -589,18 +589,22 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 
 	// Find the device class for the sensor key and get the user input unit
 	// If user has defined a unit for this device class, use it. Otherwise, use the default unit from entityUnitSource
-	if inputUnit := entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].haInputUnit; inputUnit != "" {
+	if inputUnit := entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].HaInputUnit; inputUnit != "" {
 		r := reflect.ValueOf(config)
 		field := r.FieldByName(inputUnit)
 		if field.IsValid() {
 			sensorUnit = field.String()
 		}
 	} else {
-		sensorUnit = entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].defaultUnit
+		sensorUnit = entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit
 	}
 
+	customLog("DEBUG", "unitsSystemConfig|DeviceClass: %q", unitsSystemConfig[normalizedKey].DeviceClass)
+	customLog("DEBUG", "entityUnitSource|DefaultUnit: %q", entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit)
+	customLog("DEBUG", "sensorUnit: %q", sensorUnit)
+
 	// convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
-	convertedValue = convertUnitValue(normalizedKey, value, entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].defaultUnit, sensorUnit)
+	convertedValue = convertUnitValue(normalizedKey, value, entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit, sensorUnit)
 
 	if sensorConfig, exists := unitsSystemConfig[normalizedKey]; exists {
 		// Get localized name from unitsName map
@@ -1216,7 +1220,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 			sensors = append(sensors, addSensor(
 				// key,           // Name
 				localizedName,                           // Name
-				deviceCl,                                // deviceClass
+				deviceCl,                                // DeviceClass
 				unitOfMesure,                            // UnitOfMeasurement
 				fmt.Sprintf("{{ value_json.%s }}", key), // ValueTemplate
 				// convertedValue,                                 // ValueTemplate
