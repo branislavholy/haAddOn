@@ -598,6 +598,22 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	to, errTo := u.Find(toKey)
 	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", from, to, key, value)
 
+	if fromKey == "mph" {
+		var converted float64
+		switch toKey {
+		case "km/h", "kph":
+			converted = val * 1.60934
+		case "m/s", "ms":
+			converted = val * 0.44704
+		case "kn", "knot":
+			converted = val * 0.868976
+		default:
+			converted = val // already m/s
+		}
+		customLog("DEBUG", "Manual conversion - Input units are 'from:' %q, 'to:' %q for 'key:' %q, 'value:' %q and 'converted': %q", fromKey, toKey, key, value, strconv.FormatFloat(converted, 'f', 2, 64))
+		return strconv.FormatFloat(converted, 'f', 2, 64)
+	}
+
 	// If there is an error finding the units, log it and return the original value
 	if errFrom != nil || errTo != nil {
 		customLog("ERROR", "Finding units - from: %q, to: %q", from, to)
