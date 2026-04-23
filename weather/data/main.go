@@ -512,9 +512,11 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	// Use go-units library to find the input units
 	from, errFrom := u.Find(defaultUnit)
 	to, errTo := u.Find(convertToUnit)
+	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q", from, to)
 
 	// If there is an error finding the units, log it and return the original value
 	if errFrom != nil || errTo != nil {
+		customLog("ERROR", "Finding units - from: %q, to: %q", from, to)
 		return value
 	}
 
