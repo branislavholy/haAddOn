@@ -495,6 +495,28 @@ var defaultSensorConfig = SensorConfig{
 	Measurement: "",
 }
 
+var unitMap = map[string]string{
+	// Temperature
+	"°F": "f",
+	"°C": "c",
+
+	// Speed
+	"mph":  "mph",
+	"m/s":  "ms",
+	"km/h": "kph",
+	"kn":   "knot",
+
+	// Pressure
+	"inHg": "inhg",
+	"hPa":  "hpa",
+	"mbar": "mbar",
+	"mmHg": "mmhg",
+
+	// Misc
+	"in": "in",
+	"°":  "deg",
+}
+
 func mapSymbol(s string) string {
 	switch s {
 	// Temperature
@@ -542,19 +564,17 @@ func mapSymbol(s string) string {
 
 // convertToMetric converts imperial values to metric for specific sensor types
 func convertUnitValue(key, value string, DefaultUnit string, convertToUnit string) string {
-	for _, unit := range u.All() {
-		fmt.Printf("Name: %s, Symbol: %s\n", unit.Name, unit.Symbol)
+
+	// If the default unit is the same as the desired unit, return the original value
+	if DefaultUnit == convertToUnit {
+		customLog("DEBUG", "No conversion needed for key %q, default unit %q is the same as desired unit %q", key, DefaultUnit, convertToUnit)
+		return value
 	}
 
 	// Transform string value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
 		customLog("DEBUG", "Failed to parse value %q for key %q, using original", value, key)
-		return value
-	}
-
-	// If the default unit is the same as the desired unit, return the original value
-	if DefaultUnit == convertToUnit {
 		return value
 	}
 
