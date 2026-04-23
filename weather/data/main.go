@@ -517,57 +517,57 @@ var unitMap = map[string]string{
 	"°":  "deg",
 }
 
-func mapSymbol(s string) string {
-	switch s {
-	// Temperature
-	case "°F", "Fahrenheit":
-		return "f"
-	case "°C", "Celsius":
-		return "c"
+// func mapSymbol(s string) string {
+// 	switch s {
+// 	// Temperature
+// 	case "°F", "Fahrenheit":
+// 		return "f"
+// 	case "°C", "Celsius":
+// 		return "c"
 
-	// Speed
-	case "mph":
-		return "mph"
-	case "m/s":
-		return "ms"
-	case "km/h":
-		return "kph"
-	case "kn":
-		return "knot"
+// 	// Speed
+// 	case "mph":
+// 		return "mph"
+// 	case "m/s":
+// 		return "ms"
+// 	case "km/h":
+// 		return "kph"
+// 	case "kn":
+// 		return "knot"
 
-	// Pressure
-	case "inHg":
-		return "inhg"
-	case "hPa":
-		return "hpa"
-	case "mbar":
-		return "mbar"
-	case "mmHg":
-		return "mmhg"
+// 	// Pressure
+// 	case "inHg":
+// 		return "inhg"
+// 	case "hPa":
+// 		return "hpa"
+// 	case "mbar":
+// 		return "mbar"
+// 	case "mmHg":
+// 		return "mmhg"
 
-	// Distance / Length
-	case "in":
-		return "in"
+// 	// Distance / Length
+// 	case "in":
+// 		return "in"
 
-	// Direction (Angle)
-	case "°":
-		return "deg"
+// 	// Direction (Angle)
+// 	case "°":
+// 		return "deg"
 
-	// Pass-through (Units that usually don't change)
-	case "lx", "%", "s":
-		return s
+// 	// Pass-through (Units that usually don't change)
+// 	case "lx", "%", "s":
+// 		return s
 
-	default:
-		return s
-	}
-}
+// 	default:
+// 		return s
+// 	}
+// }
 
 // convertToMetric converts imperial values to metric for specific sensor types
-func convertUnitValue(key, value string, DefaultUnit string, convertToUnit string) string {
+func convertUnitValue(key, value string, defaultUnit string, convertToUnit string) string {
 
 	// If the default unit is the same as the desired unit, return the original value
-	if DefaultUnit == convertToUnit {
-		customLog("DEBUG", "No conversion needed for key %q, default unit %q is the same as desired unit %q", key, DefaultUnit, convertToUnit)
+	if defaultUnit == convertToUnit {
+		customLog("DEBUG", "No conversion needed for key %q, default unit %q is the same as desired unit %q", key, defaultUnit, convertToUnit)
 		return value
 	}
 
@@ -578,9 +578,20 @@ func convertUnitValue(key, value string, DefaultUnit string, convertToUnit strin
 		return value
 	}
 
-	// Map units to go-units symbols
-	fromKey := mapSymbol(DefaultUnit)
-	toKey := mapSymbol(convertToUnit)
+	// // Map units to go-units symbols
+	// fromKey := mapSymbol(DefaultUnit)
+	// toKey := mapSymbol(convertToUnit)
+
+	// Look up the mapping. If not found, use the original string.
+	fromKey, ok := unitMap[defaultUnit]
+	if !ok {
+		fromKey = defaultUnit
+	}
+
+	toKey, ok := unitMap[convertToUnit]
+	if !ok {
+		toKey = convertToUnit
+	}
 
 	// Use go-units library to find the input units
 	from, errFrom := u.Find(fromKey)
