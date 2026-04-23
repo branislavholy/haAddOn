@@ -495,8 +495,57 @@ var defaultSensorConfig = SensorConfig{
 	Measurement: "",
 }
 
+func mapSymbol(s string) string {
+	switch s {
+	// Temperature
+	case "°F", "Fahrenheit":
+		return "f"
+	case "°C", "Celsius":
+		return "c"
+
+	// Speed
+	case "mph":
+		return "mph"
+	case "m/s":
+		return "ms"
+	case "km/h":
+		return "kph"
+	case "kn":
+		return "knot"
+
+	// Pressure
+	case "inHg":
+		return "inhg"
+	case "hPa":
+		return "hpa"
+	case "mbar":
+		return "mbar"
+	case "mmHg":
+		return "mmhg"
+
+	// Distance / Length
+	case "in":
+		return "in"
+
+	// Direction (Angle)
+	case "°":
+		return "deg"
+
+	// Pass-through (Units that usually don't change)
+	case "lx", "%", "s":
+		return s
+
+	default:
+		return s
+	}
+}
+
 // convertToMetric converts imperial values to metric for specific sensor types
 func convertUnitValue(key, value string, DefaultUnit string, convertToUnit string) string {
+	for _, unit := range u.All() {
+		fmt.Printf("Name: %s, Symbol: %s\n", unit.Name, unit.Symbol)
+	}
+
 	// Transform string value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
@@ -509,9 +558,13 @@ func convertUnitValue(key, value string, DefaultUnit string, convertToUnit strin
 		return value
 	}
 
+	// Map units to go-units symbols
+	fromKey := mapSymbol(DefaultUnit)
+	toKey := mapSymbol(convertToUnit)
+
 	// Use go-units library to find the input units
-	from, errFrom := u.Find(DefaultUnit)
-	to, errTo := u.Find(convertToUnit)
+	from, errFrom := u.Find(fromKey)
+	to, errTo := u.Find(toKey)
 	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", from, to, key, value)
 
 	// If there is an error finding the units, log it and return the original value
@@ -599,6 +652,7 @@ func transformInput(key, value string, config Config) (status, DeviceClass, unit
 		sensorUnit = entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit
 	}
 
+	customLog("DEBUG", "Processing 'key': %q, 'value': %q", key, value)
 	customLog("DEBUG", "unitsSystemConfig|DeviceClass: %q", unitsSystemConfig[normalizedKey].DeviceClass)
 	customLog("DEBUG", "entityUnitSource|DefaultUnit: %q", entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit)
 	customLog("DEBUG", "sensorUnit: %q", sensorUnit)
