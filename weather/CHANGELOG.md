@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.8.5](https://github.com/branislavholy/haAddOn/compare/v1.8.4...v1.8.5) (2026-04-23)
+
+
+### Bug Fixes
+
+* repare convertUnit ([fa758b9](https://github.com/branislavholy/haAddOn/commit/fa758b9c0a51673089f7b913ef2ddd5879ad7bec))
+* repare convertUnit ([05eff48](https://github.com/branislavholy/haAddOn/commit/05eff48c3552f104be75672666997acd27d72e26))
+
 ## [1.8.4](https://github.com/branislavholy/haAddOn/compare/v1.8.3...v1.8.4) (2026-04-23)
 
 
