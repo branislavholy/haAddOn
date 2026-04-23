@@ -4,14 +4,13 @@ version: 1.8.1
 init: false
 slug: garni_weather_station
 url: https://github.com/branislavholy/haAddOn/tree/main/weather
-homeassistant_api: true
 arch:
   - amd64
   - aarch64
 ports:
   80/tcp: 80
 options:
-  language: auto
+  language: en
   temperature: °C
   precipitation: mm
   pressure: hPa
@@ -23,7 +22,7 @@ options:
   password: ''
   log_level: info
 schema:
-  language: list(auto|en|sk|cz)
+  language: list(en|sk|cz)
   temperature: list(°C|°F)
   precipitation: list(mm|in)
   pressure: list(hPa|mbar|mmHg|inHg)

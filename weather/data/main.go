@@ -512,7 +512,7 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	// Use go-units library to find the input units
 	from, errFrom := u.Find(defaultUnit)
 	to, errTo := u.Find(convertToUnit)
-	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q", from, to)
+	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", from, to, key, value)
 
 	// If there is an error finding the units, log it and return the original value
 	if errFrom != nil || errTo != nil {
@@ -600,7 +600,7 @@ func transformInput(key, value string, config Config) (status, deviceClass, unit
 	}
 
 	// convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
-	convertedValue = convertUnitValue(normalizedKey, value, unitsSystemConfig[normalizedKey].DeviceClass, sensorUnit)
+	convertedValue = convertUnitValue(normalizedKey, value, entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].defaultUnit, sensorUnit)
 
 	if sensorConfig, exists := unitsSystemConfig[normalizedKey]; exists {
 		// Get localized name from unitsName map
