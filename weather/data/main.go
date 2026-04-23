@@ -6,12 +6,14 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	u "github.com/bcicen/go-units"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
@@ -52,20 +54,6 @@ var (
 	UniqIdPrefix = "sensor_"
 	undefined    = "undefined"
 )
-
-// Define a struct that matches your config.yaml options
-type Config struct {
-	MQTT struct {
-		Host     string `json:"host"`
-		Port     int    `json:"port"`
-		Username string `json:"username"`
-		Password string `json:"password"`
-		SSL      bool   `json:"ssl"`
-	} `json:"mqtt"`
-
-	UnitSystem string `json:"unit_system"`
-	Language   string `json:"language"`
-}
 
 // HomeAssistant Device structure
 type HomeAssistantDevice struct {
@@ -219,14 +207,6 @@ func customLog(level string, format string, v ...any) {
 	fmt.Printf("%s[%s] %s: %s%s\n", color, timestamp, level, msg, ColorReset)
 }
 
-// SensorConfig defines device class and unit of measurement for a sensor
-type SensorConfig struct {
-	Status      string
-	DeviceClass string
-	Unit        string
-	Measurement string
-}
-
 // UnitsConfig provides localized names for sensor types
 var UnitsConfig = map[string]map[string]string{
 	"tempf": {
@@ -373,8 +353,28 @@ var UnitsConfig = map[string]map[string]string{
 // 	"wind_speed":     "m/s",
 // }
 
+type UnitSource struct {
+	deviceClass string
+	defaultUnit string
+	haInputUnit string
+}
+
+var entityUnitSource = map[string]UnitSource{
+	"duration":       {deviceClass: "duration", defaultUnit: "s", haInputUnit: ""},
+	"humidity":       {deviceClass: "humidity", defaultUnit: "%", haInputUnit: ""},
+	"illuminance":    {deviceClass: "illuminance", defaultUnit: "lx", haInputUnit: ""},
+	"precipitation":  {deviceClass: "precipitation", defaultUnit: "in", haInputUnit: "UnitPrecipitation"},
+	"pressure":       {deviceClass: "pressure", defaultUnit: "inHg", haInputUnit: "UnitPressure"},
+	"temperature":    {deviceClass: "temperature", defaultUnit: "°F", haInputUnit: "UnitTemperature"},
+	"timestamp":      {deviceClass: "timestamp", defaultUnit: "", haInputUnit: ""},
+	"wind_direction": {deviceClass: "wind_direction", defaultUnit: "°", haInputUnit: ""},
+	"wind_speed":     {deviceClass: "wind_speed", defaultUnit: "mph", haInputUnit: "UnitSpeed"},
+	"":               {deviceClass: "", defaultUnit: "", haInputUnit: ""},
+}
+
+// // Default units for imperial system, input in request
 // var entityUnitSource = map[string]string{
-// 	"_default":       "",
+// 	"undefined":      "",
 // 	"duration":       "s",
 // 	"humidity":       "%",
 // 	"illuminance":    "lx",
@@ -386,85 +386,100 @@ var UnitsConfig = map[string]map[string]string{
 // 	"wind_speed":     "mph", //	m/s, km/h, mph, kn
 // }
 
-// var unitsSystemConfig = map[string]SensorConfig{
-// 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
-// 	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
-// 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
-// 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Measurement: "measurement"},             // Unit: "%",
-// 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Measurement: "measurement"},             // Unit: "%",
-// 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Measurement: "measurement"},             // Unit: "hPa",
-// 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Measurement: "measurement"},           // Unit: "m/s", km/h, suggested_unit_of_measurement
-// 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Measurement: "measurement"},           // Unit: "m/s", km/h,  suggested_unit_of_measurement
-// 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Measurement: "measurement_angle"}, // Unit: "°",
-// 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Measurement: "measurement"},        // Unit: "mm",
-// 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Measurement: "measurement"},        // Unit: "mm",
-// 	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Measurement: "measurement"},          // Unit: "lx",
-// 	"uv":             {Status: "enabled", DeviceClass: "", Measurement: "measurement"},                     // Unit: "",
-// 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
-// 	"winddirsite":    {Status: "enabled", DeviceClass: "", Measurement: ""},                                // Unit: "",
-// 	"uvcategories":   {Status: "enabled", DeviceClass: "", Measurement: ""},
-// 	// Disabled sensors that are not relevant for HomeAssistant
-// 	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Measurement: ""},  // Unit: "s",
-// 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Measurement: ""}, // Unit: "",
-// 	"id":       {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
-// 	"password": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
-// 	"action":   {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
-// 	"realtime": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+// var entityUnitSource = map[string]string{
+// 	"UnitTemperature":   "temperature",
+// 	"UnitPrecipitation": "precipitation",
+// 	"UnitPressure":      "pressure",
+// 	"UnitSpeed":         "wind_speed",
 // }
 
-// unitsImperial defines all sensor types with their device classes and units (°F, mph, inHg)
-var unitsImperial = map[string]SensorConfig{
-	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "in", Measurement: "measurement"},
-	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
-	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
-	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
-	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "in", Measurement: "measurement"},
-	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation_intensity", Unit: "in", Measurement: "measurement"},
-	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Unit: "lx", Measurement: "measurement"},
-	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
-	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-	// Disabled sensors that are not relevant for HomeAssistant
-	"rtfreq":   {Status: "disabled", DeviceClass: "frequency", Unit: "s", Measurement: ""},
-	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
-	"id":       {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
-	"password": {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
-	"action":   {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
-	"realtime": {Status: "disabled", DeviceClass: "binary_sensor", Unit: "", Measurement: ""},
+// SensorConfig defines device class and unit of measurement for a sensor
+type SensorConfig struct {
+	Status      string
+	DeviceClass string
+	Unit        string
+	Measurement string
 }
 
-// unitsMetric defines all sensor types with their device classes and units (°C, km/h, hPa)
-var unitsMetric = map[string]SensorConfig{
-	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "hPa", Measurement: "measurement"},
-	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // km/h
-	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // suggested_unit_of_measurement
-	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
-	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
-	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
-	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Unit: "lx", Measurement: "measurement"},
-	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
-	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+var unitsSystemConfig = map[string]SensorConfig{
+	"tempf":          {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+	"humidity":       {Status: "enabled", DeviceClass: "humidity", Measurement: "measurement"},             // Unit: "%",
+	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Measurement: "measurement"},             // Unit: "%",
+	"baromin":        {Status: "enabled", DeviceClass: "pressure", Measurement: "measurement"},             // Unit: "hPa",
+	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Measurement: "measurement"},           // Unit: "m/s", km/h, suggested_unit_of_measurement
+	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Measurement: "measurement"},           // Unit: "m/s", km/h,  suggested_unit_of_measurement
+	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Measurement: "measurement_angle"}, // Unit: "°",
+	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Measurement: "measurement"},        // Unit: "mm",
+	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Measurement: "measurement"},        // Unit: "mm",
+	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Measurement: "measurement"},          // Unit: "lx",
+	"uv":             {Status: "enabled", DeviceClass: "", Measurement: "measurement"},                     // Unit: "",
+	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Measurement: "measurement"},          // Unit: "°C",
+	"winddirsite":    {Status: "enabled", DeviceClass: "", Measurement: ""},                                // Unit: "",
+	"uvcategories":   {Status: "enabled", DeviceClass: "", Measurement: ""},
 	// Disabled sensors that are not relevant for HomeAssistant
-	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Unit: "s", Measurement: ""},
-	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
-	"id":       {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-	"password": {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-	"action":   {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-	"realtime": {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
+	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Measurement: ""},  // Unit: "s",
+	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Measurement: ""}, // Unit: "",
+	"id":       {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+	"password": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+	"action":   {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
+	"realtime": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
 }
+
+// // unitsImperial defines all sensor types with their device classes and units (°F, mph, inHg)
+// var unitsImperial = map[string]SensorConfig{
+// 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
+// 	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
+// 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
+// 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
+// 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
+// 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "in", Measurement: "measurement"},
+// 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
+// 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
+// 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
+// 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "in", Measurement: "measurement"},
+// 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation_intensity", Unit: "in", Measurement: "measurement"},
+// 	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Unit: "lx", Measurement: "measurement"},
+// 	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
+// 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
+// 	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	// Disabled sensors that are not relevant for HomeAssistant
+// 	"rtfreq":   {Status: "disabled", DeviceClass: "frequency", Unit: "s", Measurement: ""},
+// 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
+// 	"id":       {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
+// 	"password": {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
+// 	"action":   {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
+// 	"realtime": {Status: "disabled", DeviceClass: "binary_sensor", Unit: "", Measurement: ""},
+// }
+
+// // unitsMetric defines all sensor types with their device classes and units (°C, km/h, hPa)
+// var unitsMetric = map[string]SensorConfig{
+// 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
+// 	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
+// 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
+// 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
+// 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
+// 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "hPa", Measurement: "measurement"},
+// 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // km/h
+// 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // suggested_unit_of_measurement
+// 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
+// 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
+// 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
+// 	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Unit: "lx", Measurement: "measurement"},
+// 	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
+// 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
+// 	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	// Disabled sensors that are not relevant for HomeAssistant
+// 	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Unit: "s", Measurement: ""},
+// 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
+// 	"id":       {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	"password": {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	"action":   {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
+// 	"realtime": {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
+// }
 
 // // unitsSystems maps unit system names to their sensor configuration maps
 // var unitsSystems = map[string]map[string]SensorConfig{
@@ -481,81 +496,120 @@ var defaultSensorConfig = SensorConfig{
 }
 
 // convertToMetric converts imperial values to metric for specific sensor types
-func convertToMetric(key, value string, unit string) string {
-	// Parse value to float64
+func convertUnitValue(key, value string, defaultUnit string, convertToUnit string) string {
+	// Transform string value to float64
 	val, err := strconv.ParseFloat(value, 64)
 	if err != nil {
-		// log.Printf("WARN: Failed to parse value %q for key %q, using original", value, key)
+		customLog("DEBUG", "Failed to parse value %q for key %q, using original", value, key)
 		return value
 	}
-	// log.Printf("INFO: Parsed value %q for key %q, using original", value, key)
 
-	var converted float64
-	switch key {
-	case "tempf", "indoortempf", "dewptf", "windchillf":
-		// Fahrenheit to Celsius
-		converted = (val - 32) * 5 / 9
-	case "windspeedmph", "windgustmph":
-		if unit == "km/h" {
-			// mph to km/hs
-			converted = val * 1.609344
-		}
-		if unit == "m/s" {
-			// mph to m/s
-			converted = val * 0.44704
-		}
-	case "baromin":
-		// in to hPa
-		converted = val * 33.8639
-	case "rainin", "dailyrainin":
-		// inches to mm
-		converted = val * 25.4
-	default:
-		// No conversion needed
+	// If the default unit is the same as the desired unit, return the original value
+	if defaultUnit == convertToUnit {
 		return value
 	}
-	// log.Printf("Info: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
-	// Format back to string with 2 decimal places
-	return strconv.FormatFloat(converted, 'f', 2, 64)
+
+	// Use go-units library to find the input units
+	from, errFrom := u.Find(defaultUnit)
+	to, errTo := u.Find(convertToUnit)
+
+	// If there is an error finding the units, log it and return the original value
+	if errFrom != nil || errTo != nil {
+		return value
+	}
+
+	// Perform the conversion using go-units
+	result, err := u.ConvertFloat(val, from, to)
+	if err != nil {
+		return value
+	}
+
+	// Format the result to 2 decimal places and return as string
+	// return fmt.Sprintf("%.2f", result.Float())
+	return strconv.FormatFloat(result.Float(), 'f', 2, 64)
+
+	// var converted float64
+	// switch key {
+	// case "tempf", "indoortempf", "dewptf", "windchillf":
+	// 	// Fahrenheit to Celsius
+	// 	converted = (val - 32) * 5 / 9
+	// case "windspeedmph", "windgustmph":
+	// 	if unit == "km/h" {
+	// 		// mph to km/hs
+	// 		converted = val * 1.609344
+	// 	}
+	// 	if unit == "m/s" {
+	// 		// mph to m/s
+	// 		converted = val * 0.44704
+	// 	}
+	// case "baromin":
+	// 	// in to hPa
+	// 	converted = val * 33.8639
+	// case "rainin", "dailyrainin":
+	// 	// inches to mm
+	// 	converted = val * 25.4
+	// default:
+	// 	// No conversion needed
+	// 	return value
+	// }
+	// // log.Printf("Info: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
+	// // Format back to string with 2 decimal places
+	// return strconv.FormatFloat(converted, 'f', 2, 64)
 }
 
 // transformInput maps sensor keys to appropriate HomeAssistant device classes and units
 func transformInput(key, value string, config Config) (status, deviceClass, unit, localizedName, convertedValue, measurement string) {
 	// Convert key to lowercase for case-insensitive lookup
 	normalizedKey := strings.ToLower(strings.TrimSpace(key))
-	normalizedUnitsType := strings.ToLower(strings.TrimSpace(config.UnitSystem))
+	// normalizedUnitsType := strings.ToLower(strings.TrimSpace(config.UnitSystem))
 	localizedName = getLocalizedName(normalizedKey, config.Language)
 
 	// Select the appropriate unit system map
-	var selectedUnits map[string]SensorConfig
+	// var selectedUnits map[string]SensorConfig
+	var sensorUnit string
 
-	switch normalizedUnitsType {
-	case "imperial":
-		selectedUnits = unitsImperial
-		convertedValue = value
-		// log.Printf("Debug: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
-	case "metric":
-		selectedUnits = unitsMetric
-		// Convert value from imperial to metric
-		convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
-		// log.Printf("Debug: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
-	default:
-		// log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
-		customLog("WARN", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
-		// selectedUnits = unitsImperial
-		return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
+	// switch normalizedUnitsType {
+	// case "imperial":
+	// 	selectedUnits = unitsImperial
+	// 	convertedValue = value
+	// 	// log.Printf("Debug: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
+	// case "metric":
+	// 	selectedUnits = unitsMetric
+	// 	// Convert value from imperial to metric
+	// 	convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
+	// 	// log.Printf("Debug: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
+	// default:
+	// 	// log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
+	// 	customLog("WARN", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
+	// 	// selectedUnits = unitsImperial
+	// 	return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
+	// }
+
+	// Find the device class for the sensor key and get the user input unit
+	// If user has defined a unit for this device class, use it. Otherwise, use the default unit from entityUnitSource
+	if inputUnit := entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].haInputUnit; inputUnit != "" {
+		r := reflect.ValueOf(config)
+		field := r.FieldByName(inputUnit)
+		if field.IsValid() {
+			sensorUnit = field.String()
+		}
+	} else {
+		sensorUnit = entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].defaultUnit
 	}
 
-	// Look up sensor in the selected unit system map
-	if sensorConfig, exists := selectedUnits[normalizedKey]; exists {
+	// convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
+	convertedValue = convertUnitValue(normalizedKey, value, unitsSystemConfig[normalizedKey].DeviceClass, sensorUnit)
+
+	if sensorConfig, exists := unitsSystemConfig[normalizedKey]; exists {
 		// Get localized name from unitsName map
 		// log.Printf("Debug: Found sensor mapping - key=%q, value=%q, system=%q -> class=%q, unit=%q, name=%q",
 		// 	key, convertedValue, normalizedUnitsType, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName)
-		return sensorConfig.Status, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName, convertedValue, sensorConfig.Measurement
+		// return sensorConfig.Status, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName, convertedValue, sensorConfig.Measurement
+		return sensorConfig.Status, sensorConfig.DeviceClass, sensorUnit, localizedName, convertedValue, sensorConfig.Measurement
 	}
 
 	// Log WARN for unknown sensor types
-	customLog("WARN", "Unknown sensor type - key=%q (in %q system), using default mapping", key, normalizedUnitsType)
+	// customLog("WARN", "Unknown sensor type - key=%q (in %q system), using default mapping", key, normalizedUnitsType)
 
 	return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
 }
@@ -571,6 +625,24 @@ func getLocalizedName(sensorKey, language string) string {
 	}
 	// If sensor key not found in UnitsConfig, return the undefined placeholder
 	return undefined
+}
+
+// Define a struct that matches your config.yaml options
+type Config struct {
+	MQTT struct {
+		Host     string `json:"host"`
+		Port     int    `json:"port"`
+		Username string `json:"username"`
+		Password string `json:"password"`
+		SSL      bool   `json:"ssl"`
+	} `json:"mqtt"`
+
+	UnitSystem        string `json:"unit_system"`
+	UnitTemperature   string `json:"unit_temperature"`
+	UnitPrecipitation string `json:"unit_precipitation"`
+	UnitPressure      string `json:"unit_pressure"`
+	UnitSpeed         string `json:"unit_speed"`
+	Language          string `json:"language"`
 }
 
 // loadConfig loads configuration from file with fallback to defaults
@@ -591,9 +663,13 @@ func loadConfig() (Config, error) {
 			SSL:      false,
 		},
 
-		UnitSystem: "metric",
 		// UnitSystem: "imperial",
-		Language: "en",
+		UnitSystem:        "metric",
+		UnitTemperature:   "°C",  // UNIT_TEMPERATURE
+		UnitPrecipitation: "mm",  // UNIT_PRECIPITATION
+		UnitPressure:      "hPa", // UNIT_PRESSURE
+		UnitSpeed:         "m/s", // UNIT_SPEED
+		Language:          "en",
 	}
 
 	// // Try to read config file
@@ -676,10 +752,32 @@ func loadConfig() (Config, error) {
 		config.UnitSystem = strings.TrimSpace(haUnits)
 	}
 
+	if uTemperature := os.Getenv("UNIT_TEMPERATURE"); uTemperature != "" {
+		config.UnitTemperature = strings.TrimSpace(uTemperature)
+	}
+
+	if uPrecipitation := os.Getenv("UNIT_PRECIPITATION"); uPrecipitation != "" {
+		config.UnitPrecipitation = strings.TrimSpace(uPrecipitation)
+	}
+
+	if uPressure := os.Getenv("UNIT_PRESSURE"); uPressure != "" {
+		config.UnitPressure = strings.TrimSpace(uPressure)
+	}
+
+	if uSpeed := os.Getenv("UNIT_SPEED"); uSpeed != "" {
+		config.UnitSpeed = strings.TrimSpace(uSpeed)
+	}
+
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
 	customLog("INFO", "Load variable language: '%s'", config.Language)
 	customLog("INFO", "Load variable unit system: '%s'", config.UnitSystem)
+
+	customLog("DEBUG", "Load variable unit temperature: '%s'", config.UnitTemperature)
+	customLog("DEBUG", "Load variable unit precipitation: '%s'", config.UnitPrecipitation)
+	customLog("DEBUG", "Load variable unit pressure: '%s'", config.UnitPressure)
+	customLog("DEBUG", "Load variable unit speed: '%s'", config.UnitSpeed)
+
 	return config, nil
 }
 

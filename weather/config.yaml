@@ -4,6 +4,7 @@ version: 1.7.11
 init: false
 slug: garni_weather_station
 url: https://github.com/branislavholy/haAddOn/tree/main/weather
+homeassistant_api: true
 arch:
   - amd64
   - aarch64
