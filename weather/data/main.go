@@ -487,11 +487,6 @@ func transformInput(key, value string, config Config) (status, DeviceClass, unit
 		sensorUnit = entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit
 	}
 
-	customLog("DEBUG", "Processing 'key': %q, 'value': %q", key, value)
-	customLog("DEBUG", "unitsSystemConfig|DeviceClass: %q", unitsSystemConfig[normalizedKey].DeviceClass)
-	customLog("DEBUG", "entityUnitSource|DefaultUnit: %q", entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit)
-	customLog("DEBUG", "sensorUnit: %q", sensorUnit)
-
 	// Convert the value to the desired unit if necessary
 	convertedValue = convertUnitValue(normalizedKey, value, entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit, sensorUnit)
 
@@ -559,7 +554,7 @@ func loadConfig() (Config, error) {
 		// HttpServerPort:    80,
 	}
 
-	// Set the defailt values from environment variables
+	// Set the default values from environment variables
 	config := defaultConfig
 
 	// Override with environment variables if set
@@ -969,7 +964,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		}
 	}
 
-	// Add tje winddir and winddirsite sensors
+	// Add the winddir and winddirsite sensors
 	if windDir, ok := data["winddir"]; ok {
 		normWindDir := calculateWinDir(windDir)
 		data["winddir"] = normWindDir

@@ -15,7 +15,6 @@ options:
   precipitation: mm
   pressure: hPa
   speed: m/s
-  unit_system: metric
   hostname: ''
   port: 1883
   username: branislav
@@ -27,7 +26,6 @@ schema:
   precipitation: list(mm|in)
   pressure: list(hPa|mbar|mmHg|inHg)
   speed: list(m/s|km/h|mph|kn)
-  unit_system: list(metric|imperial)
   hostname: str?
   port: int?
   username: str
