@@ -433,6 +433,7 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	from, errFrom := u.Find(fromKey)
 	to, errTo := u.Find(toKey)
 	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", from, to, key, value)
+	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", fromKey, toKey, key, value)
 
 	if fromKey == "mph" {
 		var converted float64
