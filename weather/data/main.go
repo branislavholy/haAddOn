@@ -36,7 +36,7 @@ var currentLogLevelPriority int
 
 // define default variables
 var (
-	version = "1.8.11" // x-release-please-version
+	version = "1.8.10" // x-release-please-version
 	// Define by GoReleaser
 	date   = "unknown"
 	commit = "none"
@@ -432,7 +432,6 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	// Use go-units library to find the input units
 	from, errFrom := u.Find(fromKey)
 	to, errTo := u.Find(toKey)
-	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q and 'value:' %q", fromKey, toKey, key, value)
 
 	if fromKey == "mph" {
 		var converted float64
@@ -462,9 +461,12 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 		return value
 	}
 
+	resultString := strconv.FormatFloat(result.Float(), 'f', 2, 64)
+	customLog("DEBUG", "Input units are 'from:' %q, 'to:' %q for 'key:' %q original value 'value:' %q and 'converted:' %q", fromKey, toKey, key, value, resultString)
+
 	// Format the result to 2 decimal places and return as string
 	// return fmt.Sprintf("%.2f", result.Float())
-	return strconv.FormatFloat(result.Float(), 'f', 2, 64)
+	return resultString
 }
 
 // transformInput maps sensor keys to appropriate HomeAssistant device classes and units
