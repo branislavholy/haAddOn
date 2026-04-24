@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.8](https://github.com/branislavholy/haAddOn/compare/v1.8.7...v1.8.8) (2026-04-24)
+
+
+### Bug Fixes
+
+* add comments, clean code ([5a5e42c](https://github.com/branislavholy/haAddOn/commit/5a5e42c5c63e0c00c2b18fda99c1cc85cceff271))
+
 ## [1.8.7](https://github.com/branislavholy/haAddOn/compare/v1.8.6...v1.8.7) (2026-04-23)
 
 
