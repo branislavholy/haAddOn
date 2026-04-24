@@ -3,7 +3,6 @@
 echo "Starting weather service..."
 
 export HA_LANGUAGE=${HA_LANGUAGE:-$(bashio::config 'language')}
-export HA_UNITS=${HA_UNITS:-$(bashio::config 'unit_system')}
 export MQTT_HOSTNAME=${MQTT_HOSTNAME:-$(bashio::info.hostname)}
 export MQTT_PASSWORD=${MQTT_PASSWORD:-$(bashio::config 'password')}
 export MQTT_PORT=${MQTT_PORT:-1883}
@@ -24,7 +23,6 @@ if [ "$LOG_LEVEL" = "DEBUG" ]; then
   bashio::log.debug "Loaded hostname:      '$MQTT_HOSTNAME'"
   bashio::log.debug "Loaded language:      '$HA_LANGUAGE'"
   bashio::log.debug "Loaded port:          '$MQTT_PORT'"
-  bashio::log.debug "Loaded units:         '$HA_UNITS'"
   bashio::log.debug "Loaded temperature:   '$UNIT_TEMPERATURE'"
   bashio::log.debug "Loaded precipitation: '$UNIT_PRECIPITATION'"
   bashio::log.debug "Loaded pressure:      '$UNIT_PRESSURE'"

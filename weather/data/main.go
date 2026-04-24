@@ -124,6 +124,7 @@ func FillDefaultHomeAssistantConfig() HomeAssistantConfig {
 	}
 }
 
+// Updates the device information in the HomeAssistantConfig struct
 func addSensor(name, class, unit, key, id, entity, measurement string) HomeAssistantConfig {
 	c := FillDefaultHomeAssistantConfig()
 
@@ -153,12 +154,10 @@ func GetDeviceModelINFO(input string) (string, string) {
 }
 
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
-	// fmt.Println("Connected to MQTT Broker")
 	customLog("INFO", "Connected to MQTT Broker")
 }
 
 var connectLostHandler mqtt.ConnectionLostHandler = func(client mqtt.Client, err error) {
-	// fmt.Printf("Connection lost: %v", err)
 	customLog("ERROR", "Connection lost: %v", err)
 }
 
@@ -177,15 +176,12 @@ func getLevelPriority(level string) int {
 	}
 }
 
+// Simple logging function with color coding and log level filtering
 func customLog(level string, format string, v ...any) {
-	// timestamp := time.Now().Format("2006-01-02 15:04:05")
-	// fmt.Printf("[%s] %s: \t%s '%s'\n", timestamp, level, msg, payload)
-
 	if getLevelPriority(level) < currentLogLevelPriority {
 		return
 	}
 	var color string
-	// timestamp := time.Now().Format("15:04:05")
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
 
 	switch level {
@@ -203,7 +199,6 @@ func customLog(level string, format string, v ...any) {
 
 	// Use Sprintf to combine the format string with the variables
 	msg := fmt.Sprintf(format, v...)
-	// fmt.Printf("%s[%s] %s: %s '%s'%s\n", color, timestamp, level, msg, payload, ColorReset)
 	fmt.Printf("%s[%s] %s: %s%s\n", color, timestamp, level, msg, ColorReset)
 }
 
@@ -311,8 +306,8 @@ var UnitsConfig = map[string]map[string]string{
 	},
 	"windchillf": {
 		"en": "Temperature wind chill",
-		"sk": "Teplota ochladzujúci účinok vetrom",
-		"cz": "Teplota ochlazující účinek větrem",
+		"sk": "Vonkajšia teplota ochladzujúci účinok vetrom",
+		"cz": "Vonkajší teplota ochlazující účinek větrem",
 	},
 	"uvcategories": {
 		"en": "UV Categories",
@@ -321,44 +316,14 @@ var UnitsConfig = map[string]map[string]string{
 	},
 }
 
-// key=rtfreq, value=5
-// key=indoortempf, value=68
-// key=windgustmph, value=2
-// key=baromin, value=30
-// key=temperature, value=300
-// key=tempf, value=53
-// key=humidity, value=96
-// key=winddir, value=24
-// key=indoorhumidity, value=5000
-// key=UV, value=0
-// key=realtime, value=1
-// key=dailyrainin, value=0
-// key=windspeedmph, value=2
-// key=rainin, value=0
-// key=dewptf, value=52
-// key=solarradiation, value=0
-
-// {"ID":"garni2055","PASSWORD":"garni2055","UV":"0.0","action":"updateraww","dateutc":"2026-03-23T21:01:40Z","dewPoint":1.78,"humidity":"55","humidityIndoor":"60","pressure":1012.08,"rainDailymm":0,"rainmm":0,"realtime":"1","rtfreq":"5","solarradiation":"0.0","temperature":10.56,"temperatureIndoor":19.78,"windChill":2.08,"windDirSite":"SW|JZ","windGustms":0.89,"windSpeedms":0.89,"winddir":"221"}
-
-// var entityUnit = map[string]string{
-// 	"_default":       "",
-// 	"duration":       "s",
-// 	"humidity":       "%",
-// 	"illuminance":    "lx",
-// 	"precipitation":  "mm",
-// 	"pressure":       "hPa",
-// 	"temperature":    "°C",
-// 	"timestamp":      "",
-// 	"wind_direction": "°",
-// 	"wind_speed":     "m/s",
-// }
-
 type UnitSource struct {
 	DeviceClass string
 	DefaultUnit string
 	HaInputUnit string
 }
 
+// Define default units for each device class.
+// HaInputUnit is the name of the field in Config struct, define as HA input unit for user
 var entityUnitSource = map[string]UnitSource{
 	"duration":       {DeviceClass: "duration", DefaultUnit: "s", HaInputUnit: ""},
 	"humidity":       {DeviceClass: "humidity", DefaultUnit: "%", HaInputUnit: ""},
@@ -372,33 +337,20 @@ var entityUnitSource = map[string]UnitSource{
 	"":               {DeviceClass: "", DefaultUnit: "", HaInputUnit: ""},
 }
 
-// // Default units for imperial system, input in request
-// var entityUnitSource = map[string]string{
-// 	"undefined":      "",
-// 	"duration":       "s",
-// 	"humidity":       "%",
-// 	"illuminance":    "lx",
-// 	"precipitation":  "in",   // mm, in
-// 	"pressure":       "inHg", // hPa, mbar, mmHg, inHg
-// 	"temperature":    "°F",   // °C, °F
-// 	"timestamp":      "",
-// 	"wind_direction": "°",
-// 	"wind_speed":     "mph", //	m/s, km/h, mph, kn
-// }
-
-// var entityUnitSource = map[string]string{
-// 	"UnitTemperature":   "temperature",
-// 	"UnitPrecipitation": "precipitation",
-// 	"UnitPressure":      "pressure",
-// 	"UnitSpeed":         "wind_speed",
-// }
-
 // SensorConfig defines device class and unit of measurement for a sensor
 type SensorConfig struct {
 	Status      string
 	DeviceClass string
 	Unit        string
 	Measurement string
+}
+
+// Default sensor config fallback
+var defaultSensorConfig = SensorConfig{
+	Status:      "disabled",
+	DeviceClass: "",
+	Unit:        "",
+	Measurement: "",
 }
 
 var unitsSystemConfig = map[string]SensorConfig{
@@ -427,74 +379,7 @@ var unitsSystemConfig = map[string]SensorConfig{
 	"realtime": {Status: "disabled", DeviceClass: "", Measurement: ""},          // Unit: "",
 }
 
-// // unitsImperial defines all sensor types with their device classes and units (°F, mph, inHg)
-// var unitsImperial = map[string]SensorConfig{
-// 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-// 	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-// 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-// 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-// 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-// 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "in", Measurement: "measurement"},
-// 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
-// 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "mph", Measurement: "measurement"},
-// 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
-// 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "in", Measurement: "measurement"},
-// 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation_intensity", Unit: "in", Measurement: "measurement"},
-// 	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Unit: "lx", Measurement: "measurement"},
-// 	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
-// 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°F", Measurement: "measurement"},
-// 	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	// Disabled sensors that are not relevant for HomeAssistant
-// 	"rtfreq":   {Status: "disabled", DeviceClass: "frequency", Unit: "s", Measurement: ""},
-// 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
-// 	"id":       {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
-// 	"password": {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
-// 	"action":   {Status: "disabled", DeviceClass: "none", Unit: "", Measurement: ""},
-// 	"realtime": {Status: "disabled", DeviceClass: "binary_sensor", Unit: "", Measurement: ""},
-// }
-
-// // unitsMetric defines all sensor types with their device classes and units (°C, km/h, hPa)
-// var unitsMetric = map[string]SensorConfig{
-// 	"tempf":          {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-// 	"indoortempf":    {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-// 	"dewptf":         {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-// 	"humidity":       {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-// 	"indoorhumidity": {Status: "enabled", DeviceClass: "humidity", Unit: "%", Measurement: "measurement"},
-// 	"baromin":        {Status: "enabled", DeviceClass: "pressure", Unit: "hPa", Measurement: "measurement"},
-// 	"windspeedmph":   {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // km/h
-// 	"windgustmph":    {Status: "enabled", DeviceClass: "wind_speed", Unit: "m/s", Measurement: "measurement"}, // suggested_unit_of_measurement
-// 	"winddir":        {Status: "enabled", DeviceClass: "wind_direction", Unit: "°", Measurement: "measurement_angle"},
-// 	"rainin":         {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
-// 	"dailyrainin":    {Status: "enabled", DeviceClass: "precipitation", Unit: "mm", Measurement: "measurement"},
-// 	"solarradiation": {Status: "enabled", DeviceClass: "illuminance", Unit: "lx", Measurement: "measurement"},
-// 	"uv":             {Status: "enabled", DeviceClass: "", Unit: "", Measurement: "measurement"},
-// 	"windchillf":     {Status: "enabled", DeviceClass: "temperature", Unit: "°C", Measurement: "measurement"},
-// 	"winddirsite":    {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	"uvcategories":   {Status: "enabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	// Disabled sensors that are not relevant for HomeAssistant
-// 	"rtfreq":   {Status: "disabled", DeviceClass: "duration", Unit: "s", Measurement: ""},
-// 	"dateutc":  {Status: "disabled", DeviceClass: "timestamp", Unit: "", Measurement: ""},
-// 	"id":       {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	"password": {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	"action":   {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-// 	"realtime": {Status: "disabled", DeviceClass: "", Unit: "", Measurement: ""},
-// }
-
-// // unitsSystems maps unit system names to their sensor configuration maps
-// var unitsSystems = map[string]map[string]SensorConfig{
-// 	"imperial": unitsImperial,
-// 	"metric":   unitsMetric,
-// }
-
-// Default sensor config fallback
-var defaultSensorConfig = SensorConfig{
-	Status:      "disabled",
-	DeviceClass: "",
-	Unit:        "",
-	Measurement: "",
-}
-
+// Map of common unit symbols to go-units keys for conversion
 var unitMap = map[string]string{
 	// Temperature
 	"°F": "f",
@@ -517,51 +402,6 @@ var unitMap = map[string]string{
 	"°":  "deg",
 }
 
-// func mapSymbol(s string) string {
-// 	switch s {
-// 	// Temperature
-// 	case "°F", "Fahrenheit":
-// 		return "f"
-// 	case "°C", "Celsius":
-// 		return "c"
-
-// 	// Speed
-// 	case "mph":
-// 		return "mph"
-// 	case "m/s":
-// 		return "ms"
-// 	case "km/h":
-// 		return "kph"
-// 	case "kn":
-// 		return "knot"
-
-// 	// Pressure
-// 	case "inHg":
-// 		return "inhg"
-// 	case "hPa":
-// 		return "hpa"
-// 	case "mbar":
-// 		return "mbar"
-// 	case "mmHg":
-// 		return "mmhg"
-
-// 	// Distance / Length
-// 	case "in":
-// 		return "in"
-
-// 	// Direction (Angle)
-// 	case "°":
-// 		return "deg"
-
-// 	// Pass-through (Units that usually don't change)
-// 	case "lx", "%", "s":
-// 		return s
-
-// 	default:
-// 		return s
-// 	}
-// }
-
 // convertToMetric converts imperial values to metric for specific sensor types
 func convertUnitValue(key, value string, defaultUnit string, convertToUnit string) string {
 
@@ -577,10 +417,6 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 		customLog("DEBUG", "Failed to parse value %q for key %q, using original", value, key)
 		return value
 	}
-
-	// // Map units to go-units symbols
-	// fromKey := mapSymbol(DefaultUnit)
-	// toKey := mapSymbol(convertToUnit)
 
 	// Look up the mapping. If not found, use the original string.
 	fromKey, ok := unitMap[defaultUnit]
@@ -629,66 +465,18 @@ func convertUnitValue(key, value string, defaultUnit string, convertToUnit strin
 	// Format the result to 2 decimal places and return as string
 	// return fmt.Sprintf("%.2f", result.Float())
 	return strconv.FormatFloat(result.Float(), 'f', 2, 64)
-
-	// var converted float64
-	// switch key {
-	// case "tempf", "indoortempf", "dewptf", "windchillf":
-	// 	// Fahrenheit to Celsius
-	// 	converted = (val - 32) * 5 / 9
-	// case "windspeedmph", "windgustmph":
-	// 	if unit == "km/h" {
-	// 		// mph to km/hs
-	// 		converted = val * 1.609344
-	// 	}
-	// 	if unit == "m/s" {
-	// 		// mph to m/s
-	// 		converted = val * 0.44704
-	// 	}
-	// case "baromin":
-	// 	// in to hPa
-	// 	converted = val * 33.8639
-	// case "rainin", "dailyrainin":
-	// 	// inches to mm
-	// 	converted = val * 25.4
-	// default:
-	// 	// No conversion needed
-	// 	return value
-	// }
-	// // log.Printf("Info: Value %q converted to %q for key %q", value, strconv.FormatFloat(converted, 'f', 2, 64), key)
-	// // Format back to string with 2 decimal places
-	// return strconv.FormatFloat(converted, 'f', 2, 64)
 }
 
 // transformInput maps sensor keys to appropriate HomeAssistant device classes and units
 func transformInput(key, value string, config Config) (status, DeviceClass, unit, localizedName, convertedValue, measurement string) {
 	// Convert key to lowercase for case-insensitive lookup
 	normalizedKey := strings.ToLower(strings.TrimSpace(key))
-	// normalizedUnitsType := strings.ToLower(strings.TrimSpace(config.UnitSystem))
+	// Get the localized name of the sensor
 	localizedName = getLocalizedName(normalizedKey, config.Language)
-
-	// Select the appropriate unit system map
-	// var selectedUnits map[string]SensorConfig
-	var sensorUnit string
-
-	// switch normalizedUnitsType {
-	// case "imperial":
-	// 	selectedUnits = unitsImperial
-	// 	convertedValue = value
-	// 	// log.Printf("Debug: Using %q unit system for sensor - key=%q, value=%q", normalizedUnitsType, key, convertedValue)
-	// case "metric":
-	// 	selectedUnits = unitsMetric
-	// 	// Convert value from imperial to metric
-	// 	convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
-	// 	// log.Printf("Debug: Using %q unit system for sensor - key=%q, original=%q, converted=%q", normalizedUnitsType, key, value, convertedValue)
-	// default:
-	// 	// log.Printf("WARN: Unknown unit system %q, defaulting to imperial", normalizedUnitsType)
-	// 	customLog("WARN", "Unknown unit system: %q, defaulting to imperial", normalizedUnitsType)
-	// 	// selectedUnits = unitsImperial
-	// 	return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
-	// }
 
 	// Find the device class for the sensor key and get the user input unit
 	// If user has defined a unit for this device class, use it. Otherwise, use the default unit from entityUnitSource
+	var sensorUnit string
 	if inputUnit := entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].HaInputUnit; inputUnit != "" {
 		r := reflect.ValueOf(config)
 		field := r.FieldByName(inputUnit)
@@ -704,24 +492,17 @@ func transformInput(key, value string, config Config) (status, DeviceClass, unit
 	customLog("DEBUG", "entityUnitSource|DefaultUnit: %q", entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit)
 	customLog("DEBUG", "sensorUnit: %q", sensorUnit)
 
-	// convertedValue = convertToMetric(normalizedKey, value, selectedUnits[normalizedKey].Unit)
+	// Convert the value to the desired unit if necessary
 	convertedValue = convertUnitValue(normalizedKey, value, entityUnitSource[unitsSystemConfig[normalizedKey].DeviceClass].DefaultUnit, sensorUnit)
 
 	if sensorConfig, exists := unitsSystemConfig[normalizedKey]; exists {
-		// Get localized name from unitsName map
-		// log.Printf("Debug: Found sensor mapping - key=%q, value=%q, system=%q -> class=%q, unit=%q, name=%q",
-		// 	key, convertedValue, normalizedUnitsType, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName)
-		// return sensorConfig.Status, sensorConfig.DeviceClass, sensorConfig.Unit, localizedName, convertedValue, sensorConfig.Measurement
 		return sensorConfig.Status, sensorConfig.DeviceClass, sensorUnit, localizedName, convertedValue, sensorConfig.Measurement
 	}
-
-	// Log WARN for unknown sensor types
-	// customLog("WARN", "Unknown sensor type - key=%q (in %q system), using default mapping", key, normalizedUnitsType)
 
 	return defaultSensorConfig.Status, defaultSensorConfig.DeviceClass, defaultSensorConfig.Unit, localizedName, value, defaultSensorConfig.Measurement
 }
 
-// getLocalizedName returns the localized name for a sensor key
+// Returns the localized name for a sensor key
 func getLocalizedName(sensorKey, language string) string {
 	if localizedNames, exists := UnitsConfig[sensorKey]; exists {
 		if name, langExists := localizedNames[strings.ToLower(language)]; langExists {
@@ -744,12 +525,12 @@ type Config struct {
 		SSL      bool   `json:"ssl"`
 	} `json:"mqtt"`
 
-	UnitSystem        string `json:"unit_system"`
 	UnitTemperature   string `json:"unit_temperature"`
 	UnitPrecipitation string `json:"unit_precipitation"`
 	UnitPressure      string `json:"unit_pressure"`
 	UnitSpeed         string `json:"unit_speed"`
 	Language          string `json:"language"`
+	// HttpServerPort    int    `json:"http_server_port"`
 }
 
 // loadConfig loads configuration from file with fallback to defaults
@@ -770,32 +551,16 @@ func loadConfig() (Config, error) {
 			SSL:      false,
 		},
 
-		// UnitSystem: "imperial",
-		UnitSystem:        "metric",
 		UnitTemperature:   "°C",  // UNIT_TEMPERATURE
 		UnitPrecipitation: "mm",  // UNIT_PRECIPITATION
 		UnitPressure:      "hPa", // UNIT_PRESSURE
 		UnitSpeed:         "m/s", // UNIT_SPEED
 		Language:          "en",
+		// HttpServerPort:    80,
 	}
 
-	// // Try to read config file
-	// file, err := os.ReadFile(configPath)
-	// if err != nil {
-	// 	if os.IsNotExist(err) {
-	// 		log.Printf("WARN: Config file not found at %s, using defaults", configPath)
-	// 	} else {
-	// 		log.Printf("ERROR: Failed to read config file: %v, using defaults", err)
-	// 	}
-	// 	return defaultConfig
-	// }
-
-	// Parse JSON config
+	// Set the defailt values from environment variables
 	config := defaultConfig
-	// if err := json.Unmarshal(file, &config); err != nil {
-	// 	log.Printf("ERROR: Failed to parse config JSON: %v, using defaults", err)
-	// 	return defaultConfig
-	// }
 
 	// Override with environment variables if set
 	if envHost := os.Getenv("MQTT_HOSTNAME"); envHost != "" {
@@ -822,26 +587,12 @@ func loadConfig() (Config, error) {
 		config.MQTT.Password = envPass
 	} else {
 		customLog("ERROR", "MQTT_PASSWORD is not defined in environment variables")
-		// os.Exit(1)
+		os.Exit(1)
 	}
 
 	if config.MQTT.Username == "" || config.MQTT.Password == "" {
 		return Config{}, fmt.Errorf("mqtt username and password must be provided")
 	}
-
-	// // Validate and fill missing values with defaults
-	// if config.MQTT.Host == "" {
-	// 	config.MQTT.Host = defaultConfig.MQTT.Host
-	// }
-	// if config.MQTT.Port == 0 {
-	// 	config.MQTT.Port = defaultConfig.MQTT.Port
-	// }
-	// if config.MQTT.Username == "" {
-	// 	config.MQTT.Username = defaultConfig.MQTT.Username
-	// }
-	// if config.MQTT.Password == "" {
-	// 	config.MQTT.Password = defaultConfig.MQTT.Password
-	// }
 
 	if config.MQTT.Port <= 0 || config.MQTT.Port > 65535 {
 		return Config{}, fmt.Errorf("mqtt port must be between 1 and 65535")
@@ -853,10 +604,6 @@ func loadConfig() (Config, error) {
 
 	if haLanguage := os.Getenv("HA_LANGUAGE"); haLanguage != "" {
 		config.Language = strings.TrimSpace(haLanguage)
-	}
-
-	if haUnits := os.Getenv("HA_UNITS"); haUnits != "" {
-		config.UnitSystem = strings.TrimSpace(haUnits)
 	}
 
 	if uTemperature := os.Getenv("UNIT_TEMPERATURE"); uTemperature != "" {
@@ -875,11 +622,17 @@ func loadConfig() (Config, error) {
 		config.UnitSpeed = strings.TrimSpace(uSpeed)
 	}
 
+	// if httpServerPort := os.Getenv("HTTP_SERVER_PORT"); httpServerPort != "" {
+	// 	if port, err := strconv.Atoi(httpServerPort); err == nil {
+	// 		config.HttpServerPort = port
+	// 	} else {
+	// 		customLog("ERROR", "Failed to parse HTTP_SERVER_PORT %q, using default", httpServerPort)
+	// 	}
+	// }
+
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
 	customLog("INFO", "Load variable language: '%s'", config.Language)
-	customLog("INFO", "Load variable unit system: '%s'", config.UnitSystem)
-
 	customLog("DEBUG", "Load variable unit temperature: '%s'", config.UnitTemperature)
 	customLog("DEBUG", "Load variable unit precipitation: '%s'", config.UnitPrecipitation)
 	customLog("DEBUG", "Load variable unit pressure: '%s'", config.UnitPressure)
@@ -888,22 +641,22 @@ func loadConfig() (Config, error) {
 	return config, nil
 }
 
+// Calculate the wind chill
 func calculateWindChill(tempF, windSpeedMph string) string {
 	tempfVal, _ := strconv.ParseFloat(tempF, 64)
 	windspeedVal, _ := strconv.ParseFloat(windSpeedMph, 64)
 	wc := 35.74 +
 		(0.6215 * tempfVal) -
 		(35.75 * math.Pow(windspeedVal, 0.16)) +
-		// (0.4275 * math.Pow(windspeedVal, 0.16))
 		(0.4275 * tempfVal * math.Pow(windspeedVal, 0.16))
 	return strconv.FormatFloat(wc, 'f', 2, 64)
 }
 
+// Calculate Wind Direction in degrees and normalize it to 0-360 range
 func calculateWinDir(windDir string) string {
 	// Normalize wind direction to 0-360 range
 	val, err := strconv.ParseFloat(windDir, 64)
 	if err != nil {
-		// log.Printf("WARN: Failed to parse wind direction %q, using original", windDir)
 		customLog("WARN", "Failed to parse wind direction %q, using original", windDir)
 		return windDir
 	}
@@ -921,6 +674,7 @@ func calculateWinDir(windDir string) string {
 	return strconv.FormatFloat(val, 'f', 0, 64)
 }
 
+// Calculate Wind Direction as site-specific
 func calculateWindDirSite(windDir string) string {
 	// Parse wind direction to float64
 	value, err := strconv.ParseFloat(windDir, 64)
@@ -969,12 +723,7 @@ func calculateWindDirSite(windDir string) string {
 	}
 }
 
-// TODO: The UV Index Scale
-// 0 – 2: Low
-// 3 – 5: Moderate
-// 6 – 7: High
-// 8 – 10: Very High
-// 11+: Extreme
+// Calculate UV categories based on UV index value
 func calculateUvCategories(uvValue string) string {
 	uvNormalize, err := strconv.ParseFloat(uvValue, 64)
 	if err != nil {
@@ -995,6 +744,7 @@ func calculateUvCategories(uvValue string) string {
 	}
 }
 
+// Establishes a connection to the MQTT broker using the provided configuration
 func mqttConnect(config Config) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 
@@ -1007,7 +757,7 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.SetPassword(config.MQTT.Password)
 	opts.AddBroker(broker)
 
-	// Force MQTT 3.1.1 for better compatibility with Mosquitto
+	// Use MQTT protocol version 4 (MQTT 3.1.1) for compatibility with Home Assistant
 	opts.SetProtocolVersion(4)
 
 	// Generate a unique ClientID to avoid connection loops
@@ -1048,33 +798,9 @@ func mqttConnect(config Config) mqtt.Client {
 	return client
 }
 
-// func mqttConnect(config Config) mqtt.Client {
-// 	opts := mqtt.NewClientOptions()
-
-// 	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-// 	opts.AddBroker(broker)
-
-// 	opts.SetProtocolVersion(4)
-
-// 	uID := fmt.Sprintf("weather-%d", time.Now().Unix()%1000)
-// 	opts.SetClientID(uID)
-// 	opts.SetUsername(config.MQTT.Username)
-// 	opts.SetPassword(config.MQTT.Password)
-// 	opts.SetCleanSession(false)
-
-// 	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
-
-// 	client := mqtt.NewClient(opts)
-
-// 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-// 		customLog("ERROR", "MQTT: %v", token.Error())
-// 	}
-
-// 	return client
-// }
-
 func main() {
 
+	// Set log level from environment variable with default to INFO
 	envLogLevel := os.Getenv("LOG_LEVEL")
 	if envLogLevel == "" {
 		envLogLevel = "INFO"
@@ -1082,39 +808,34 @@ func main() {
 	currentLogLevelPriority = getLevelPriority(envLogLevel)
 
 	// Load configuration with fallback to defaults
-	// config := loadConfig("/data/options.json")
 	config, err := loadConfig()
 	if err != nil {
 		customLog("ERROR", "Configuration error: %v", err)
 		os.Exit(1)
 	}
 
-	// // Now you can initialize your MQTT client
-	// broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
-
-	// temperatureFahrenheit := u.NewValue(tempf, u.Fahrenheit)
-	// temperatureCelsius := temperatureFahrenheit.MustConvert(u.Celsius)
-	// customLog("INFO", "temperatureCelsius:", strconv.FormatFloat(temperatureCelsius.Float(), 'f', 2, 64))
-
-	// windspeedkph := windspeedmph * 1.609344
-	// customLog("INFO", "windspeedKilometerPerHour:", strconv.FormatFloat(windspeedkph, 'f', 2, 64))
-
+	// Establish MQTT connection
 	client := mqttConnect(config)
+	// Ensure the client disconnects gracefully on application exit
 	defer client.Disconnect(250)
 
 	customLog("INFO", "Build version: '%s'", version)
 	customLog("INFO", "Build commit: '%s'", commit)
 	customLog("INFO", "Build date: '%s'", date)
 
+	// if config.HttpServerPort != 80 {
+	// 	hexaDumpName = "0x776-GO-TEST-CODE"
+	// }
+	// customLog("INFO", "System name: %s", hexaDumpName)
+
+	// Set up HTTP server and route for weather station updates
 	mux := http.NewServeMux()
-	// Wrap handleData with config using a closure
-	// mux.HandleFunc("/weatherstation/updateweatherstation2.php", handleData)
 	mux.HandleFunc("/weatherstation/updateweatherstation.php", func(w http.ResponseWriter, r *http.Request) {
 		handleData(w, r, config, client)
 	})
 
 	server := &http.Server{
+		// Addr:              ":" + strconv.Itoa(config.HttpServerPort),
 		Addr:              ":80",
 		Handler:           mux,
 		ReadHeaderTimeout: 5 * time.Second,  // Protects against Slowloris attacks
@@ -1123,56 +844,26 @@ func main() {
 		IdleTimeout:       60 * time.Second, // Keep-alive duration
 	}
 
-	// log.Printf("Starting server on %s", server.Addr)
 	customLog("INFO", "Starting server on: '%s'", server.Addr)
 	if err := server.ListenAndServe(); err != nil {
-		// log.Fatalf("Server failed: %s", err)
 		customLog("ERROR", "Server failed: %v", err)
 	}
 }
 
-// func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
-// 	for _, itemSenzor := range sensors {
-// 		topic := fmt.Sprintf(topicConfig, strings.TrimPrefix(itemSenzor.UniqueId, UniqIdPrefix))
-
-// 		// FAST CHECK: If already registered, skip everything immediately
-// 		if _, alreadyRegistered := registeredTopics.Load(topic); alreadyRegistered {
-// 			continue
-// 		}
-
-// 		// DISCONNECTED CHECK: Skip if network is down
-// 		if !client.IsConnected() {
-// 			continue
-// 		}
-
-// 		// ASYNCHRONOUS REGISTER: Use a goroutine ONLY for the network call
-// 		go func(s HomeAssistantConfig, t string) {
-// 			payload, _ := json.Marshal(s)
-
-// 			// Fire the message
-// 			cleanTopic := strings.TrimSpace(t)
-// 			token := client.Publish(cleanTopic, 0, true, payload)
-// 			customLog("DEBUG", "Topic: [%s]", topic)
-// 			customLog("DEBUG", "Payload length: %d", len(payload))
-
-// 			// Wait in the background so we don't block the main loop
-// 			if token.Wait() && token.Error() == nil {
-// 				registeredTopics.Store(t, true)
-// 				customLog("INFO", "Registered: %s", t)
-// 			}
-// 		}(itemSenzor, topic)
-// 	}
-// }
-
+// Registers sensors with Home Assistant using MQTT discovery, with goroutines and concurrency control to prevent MQTT flooding
 func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
+	// Use a WaitGroup to wait for all goroutines to finish before exiting the function
 	var wg sync.WaitGroup
 	// Create a buffered channel to limit concurrency and prevent MQTT flooding
 	semaphore := make(chan struct{}, 7)
 
 	for _, itemSenzor := range sensors {
+		// Increment the WaitGroup counter for each sensor registration
 		wg.Add(1)
 
+		// Gorutine to handle each sensor registration concurrently
 		go func(localSenzor HomeAssistantConfig) {
+			// Decrement the WaitGroup counter when the goroutine finishes
 			defer wg.Done()
 
 			// Create topic by removing prefix from UniqueId
@@ -1210,7 +901,7 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 			if token.Wait() && token.Error() == nil {
 				registeredTopics.Store(topic, true)
 				customLog("INFO", "Sensor '%s' successfully registered.", sensorID)
-				// ADD THIS DELAY: Give Mosquitto 100ms to breathe between sensors
+				// This delay gives Mosquitto 100ms to breathe between sensors
 				// This prevents the "flood" that causes the EOF disconnect.
 				time.Sleep(100 * time.Millisecond)
 			} else {
@@ -1223,6 +914,7 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 	wg.Wait()
 }
 
+// Handles incoming HTTP requests from the weather station, processes the data, and publishes it to MQTT for Home Assistant integration
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
 	var sensors []HomeAssistantConfig
 	var data = make(map[string]string)
@@ -1237,11 +929,11 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("WARN", "Failed to write response to station: %v", err)
 	}
 
+	// load the data from the request form into a map, skipping empty keys or values
 	for key, values := range r.Form {
 		for _, val := range values {
 			// Skip empty entries
 			if key == "" || val == "" {
-				// log.Printf("WARN: Skipping empty key or value - key=%q, value=%q", key, val)
 				customLog("WARN", "Skipping empty key or value - key=%q, value=%q", key, val)
 				continue
 			}
@@ -1251,42 +943,47 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// Fill the default values for HomeAssistant Origin MQTT config
 	homeAssistantOrigin := FillDefaultHomeAssistantOrigin()
-	// log.Printf("Default Origin: %+v", homeAssistantOrigin)
 	customLog("DEBUG", "Origin payload: '%+v'", homeAssistantOrigin)
 
 	// Fill the default values for HomeAssistant Device MQTT config
 	homeAssistantDevice := FillDefaultHomeAssistantDevice()
 
+	// Fill the default value
 	stationId := Id
 	if stationPayloadId, ok := data["ID"]; ok {
 		stationId = stationPayloadId
 	}
 	homeAssistantDevice.ModeId = stationId
 
+	// Fill the model and hardware version based on the station ID
 	modelName, modelVersion := GetDeviceModelINFO(stationId)
 	homeAssistantDevice.Model = strings.ToUpper(modelName)
 	homeAssistantDevice.HwVersion = modelVersion
+
 	customLog("DEBUG", "Device payload: '%+v'", homeAssistantDevice)
 
+	// Add the windchillf sensor
 	if tempf, ok_t := data["tempf"]; ok_t {
 		if windSpeed, ok_w := data["windspeedmph"]; ok_w {
 			data["windchillf"] = calculateWindChill(tempf, windSpeed)
 		}
 	}
 
+	// Add tje winddir and winddirsite sensors
 	if windDir, ok := data["winddir"]; ok {
 		normWindDir := calculateWinDir(windDir)
 		data["winddir"] = normWindDir
 		data["winddirsite"] = calculateWindDirSite(normWindDir)
 	}
 
+	// Add the UV categories sensor
 	if uv, ok := data["UV"]; ok {
 		data["uvcategories"] = calculateUvCategories(uv)
 	}
 
-	// log.Printf("data: %s\n", data)
 	customLog("DEBUG", "Received original map data: %v", data)
 
+	// Load and parse the original JSON payload for logging purposes
 	jsonOriginalData, err := json.Marshal(data)
 	if err != nil {
 		customLog("ERROR", "Message: %v", err)
@@ -1296,103 +993,40 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// Process and validate each sensor
 	for key, value := range data {
-		// Input validation
 		key = strings.TrimSpace(key)
 		value = strings.TrimSpace(value)
 
-		// log.Printf("Processing - key=%s, value=%s", key, value)
-		// log.Printf("UnitSystem=%s", config.UnitSystem)
-		// log.Printf("Language=%s", config.Language)
-
+		// Transform the input key and value to determine if the sensor should be registered.
 		status, deviceCl, unitOfMesure, localizedName, convertedValue, measurement := transformInput(key, value, config)
-		// log.Printf("Processing end - key=%s, value=%s", key, value)
 
-		// log.Printf("Sensor config: status=%s, class=%s, unit=%s, name=%s, converted=%s", status, deviceCl, unitOfMesure, localizedName, convertedValue)
+		// Update the data map with the converted value for MQTT payload
 		data[key] = convertedValue
-		// var deviceCl string
-		// var unitOfMesure string
-		// // if key == "temperature" {
-		// deviceCl = "temperature"
-		// unitOfMesure = "°F"
-		// // }
 
+		// Only add sensors that are enabled in the configuration
 		if status == "enabled" {
-			// name, class, unit, key, id, entity
 			sensors = append(sensors, addSensor(
-				// key,           // Name
 				localizedName,                           // Name
 				deviceCl,                                // DeviceClass
 				unitOfMesure,                            // UnitOfMeasurement
 				fmt.Sprintf("{{ value_json.%s }}", key), // ValueTemplate
-				// convertedValue,                                 // ValueTemplate
-				fmt.Sprintf("%s%s", UniqIdPrefix, key),         // UniqueId
+				fmt.Sprintf("%s%s", UniqIdPrefix, key),  // UniqueId
 				fmt.Sprintf("sensor.%s_%s", hexaDumpName, key), // DefaultEntityId
 				measurement, // StateClass
 			))
 		}
 	}
 
-	// jsonData, err := json.Marshal(convertedData)
-	// if err != nil {
-	// 		("ERROR", "Message: ", err)
-	// 	return
-	// }
+	// Convert the final data and logging the JSON payload that will be published to MQTT
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		customLog("ERROR", "Message: %v", err)
 		return
 	}
 	customLog("INFO", "Converted json payload: '%s'", jsonData)
-	// payload, err := json.MarshalIndent(sensors, "", "  ")
 
-	// Correct logging
-	// payload, err := json.Marshal(sensors)
-	// if err != nil {
-	// 	log.Fatalf("ERROR marshaling sensors: %s", err)
-	// }
-
-	// fmt.Println("--- Registered Sensors Configuration ---")
-	// // fmt.Println(string(payload))
-	// fmt.Printf("..Published: %s\n", payload)
-
-	// opts := mqtt.NewClientOptions()
-
-	// // Now you can initialize your MQTT client
-	// broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
-	// fmt.Printf("Connecting to MQTT at: %s with user: %s\n", broker, config.MQTT.Username)
-
-	// // opts.SetUsername(os.Getenv("MQTT_USERNAME"))
-	// // opts.SetPassword(os.Getenv("MQTT_PASSWORD"))
-	// opts.SetUsername(config.MQTT.Username)
-	// opts.SetPassword(config.MQTT.Password)
-	// opts.AddBroker(broker)
-	// opts.SetClientID(clientID)
-	// opts.SetDefaultPublishHandler(messagePubHandler)
-
-	// opts.SetKeepAlive(30 * time.Second)
-	// opts.SetDefaultPublishHandler(func(client mqtt.Client, msg mqtt.Message) {
-	// 	log.Printf("TOPIC: %s\n", msg.Topic())
-	// 	log.Printf("MSG: %s\n", msg.Payload())
-	// })
-
-	// opts.SetPingTimeout(1 * time.Second)
-	// opts.SetAutoReconnect(true)
-	// opts.SetMaxReconnectInterval(10 * time.Second)
-	// opts.SetConnectRetry(true)
-	// opts.SetConnectRetryInterval(10 * time.Second)
-	// opts.SetWriteTimeout(60 * time.Second)
-
-	// opts.OnConnect = connectHandler
-	// opts.OnConnectionLost = connectLostHandler
-
-	// client := mqtt.NewClient(opts)
-	// if token := client.Connect(); token.Wait() && token.ERROR() != nil {
-	// 	customLog("INFO", "MQTT:", token.ERROR())
-	// }
-	// defer client.Disconnect(250)
-
+	// Goroutine to register sensors concurrently without blocking the main HTTP handler
 	go registerSensors(client, sensors)
 
+	// Publish the sensor data to MQTT with QoS 1 and Retain flag set to true
 	client.Publish(topic, 1, true, jsonData).Wait()
-	// fmt.Printf("..Published State: %s\n", jsonData)
 }
