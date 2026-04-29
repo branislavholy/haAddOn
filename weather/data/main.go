@@ -39,7 +39,7 @@ var currentLogLevelPriority int
 
 // define default variables
 var (
-	version = "1.9.1" // x-release-please-version
+	version = "1.9.2" // x-release-please-version
 	// Define by GoReleaser
 	date   = "unknown"
 	commit = "none"
@@ -1040,10 +1040,12 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 // Handles incoming HTTP requests from the weather station, processes the data, and publishes it to MQTT for Home Assistant integration
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
-	customLog("INFO", "Start handleData method for request from %s", r.RemoteAddr)
+	customLog("DEBUG", "Start handleData method for request from %s", r.RemoteAddr)
+	customLog("WARN", "Start handleData method")
 	var sensors []HomeAssistantConfig
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
+		customLog("ERROR", "HTTP method %q not allowed, only POST is accepted", r.Method)
 		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
@@ -1051,6 +1053,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	// Add rate limiting
 	if !checkRateLimit() {
 		customLog("WARN", "Rate limit exceeded, rejecting request")
+		customLog("ERROR", "Rate limit exceeded for request from %s", r.RemoteAddr)
 		http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
 		return
 	}
@@ -1077,6 +1080,8 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 	if _, err := w.Write([]byte("success")); err != nil {
 		customLog("WARN", "Failed to write response to station: %v", err)
 	}
+
+	customLog("DEBUG", "Validation finished, processing data for MQTT publication")
 
 	var data = make(map[string]string)
 
@@ -1140,7 +1145,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		data["uvcategories"] = calculateUvCategories(uv)
 	}
 
-	customLog("DEBUG", "Received original map data: %v", data)
+	customLog("INFO", "Received original map data: %v", data)
 
 	// Load and parse the original JSON payload for logging purposes
 	jsonOriginalData, err := json.Marshal(data)
@@ -1148,7 +1153,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("ERROR", "Message: %v", err)
 		return
 	}
-	customLog("DEBUG", "Received original json payload: '%s'", jsonOriginalData)
+	customLog("INFO", "Received original json payload: '%s'", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
