@@ -29,19 +29,17 @@ jobs:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
       - uses: actions/checkout@v6
-        if: "!startsWith(github.event.head_commit.message, 'chore(main): release')"
+        # if: "!startsWith(github.event.head_commit.message, 'chore(main): release')"
         with:
           fetch-depth: 0
 
       - name: Setup Go
-        if: "!startsWith(github.event.head_commit.message, 'chore(main): release')"
         uses: actions/setup-go@v6
         with:
           go-version-file: weather/data/go.mod
           cache-dependency-path: weather/data/go.sum
 
       - name: Run GoReleaser
-        if: "!startsWith(github.event.head_commit.message, 'chore(main): release')"
         uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
