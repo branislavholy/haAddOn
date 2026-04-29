@@ -622,7 +622,7 @@ func loadConfig() (Config, error) {
 		UnitPressure:      "hPa", // UNIT_PRESSURE
 		UnitSpeed:         "m/s", // UNIT_SPEED
 		Language:          "en",
-		// HttpServerPort:    80,
+		// HttpServerPort:   80,
 	}
 
 	// Set the default values from environment variables
