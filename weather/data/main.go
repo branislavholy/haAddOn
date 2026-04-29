@@ -1,8 +1,10 @@
 package main
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math"
 	"net/http"
 	"os"
@@ -11,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	u "github.com/bcicen/go-units"
@@ -153,6 +156,67 @@ func GetDeviceModelINFO(input string) (string, string) {
 	return name, version
 }
 
+// Security: Input validation patterns
+var (
+	inputPattern = regexp.MustCompile(`^[a-zA-Z0-9_\-\.]+$`)
+	// numericPattern  = regexp.MustCompile(`^-?\d+\.?\d*$`)
+	// stationIdPattern = regexp.MustCompile(`^[a-zA-Z0-9_\-]+$`)
+)
+
+// Rate limiting for HTTP requests
+var (
+	requestCount    int64
+	lastRequestTime int64
+	rateLimitWindow = time.Second // 1 request per second max
+)
+
+// validateInput validates and sanitizes user input
+func validateInput(key, value string) (string, string, bool) {
+	key = strings.TrimSpace(key)
+	value = strings.TrimSpace(value)
+
+	// Check key format
+	if len(key) == 0 || len(key) > 100 {
+		return "", "", false
+	}
+
+	// Validate key format against allowed pattern
+	if !inputPattern.MatchString(key) {
+		customLog("WARN", "Invalid key format: %q", key)
+		return "", "", false
+	}
+
+	// Validate value length
+	if len(value) > 1000 {
+		customLog("WARN", "Value too long for key: %q, value: %q", key, value)
+		return "", "", false
+	}
+
+	return key, value, true
+}
+
+// checkRateLimit implements simple rate limiting
+func checkRateLimit() bool {
+	// Get the current time in nanoseconds
+	now := time.Now().UnixNano()
+	// Get the last request time
+	lastTime := atomic.LoadInt64(&lastRequestTime)
+
+	// Validate if request is within the rate limit window
+	if now-lastTime < rateLimitWindow.Nanoseconds() {
+		return false
+	}
+
+	// Update the last request time
+	if !atomic.CompareAndSwapInt64(&lastRequestTime, lastTime, now) {
+		return false
+	}
+
+	// Increment the request count
+	atomic.AddInt64(&requestCount, 1)
+	return true
+}
+
 var connectHandler mqtt.OnConnectHandler = func(client mqtt.Client) {
 	customLog("INFO", "Connected to MQTT Broker")
 }
@@ -178,6 +242,7 @@ func getLevelPriority(level string) int {
 
 // Simple logging function with color coding and log level filtering
 func customLog(level string, format string, v ...any) {
+	level = strings.ToUpper(strings.TrimSpace(level))
 	if getLevelPriority(level) < currentLogLevelPriority {
 		return
 	}
@@ -189,7 +254,7 @@ func customLog(level string, format string, v ...any) {
 		color = ColorCyan
 	case "INFO":
 		color = ColorReset
-	case "WARN":
+	case "WARN", "WARNING":
 		color = ColorYellow
 	case "ERROR":
 		color = ColorRed
@@ -515,11 +580,12 @@ func getLocalizedName(sensorKey, language string) string {
 // Define a struct that matches your config.yaml options
 type Config struct {
 	MQTT struct {
-		Host     string `json:"host"`
-		Port     int    `json:"port"`
-		Username string `json:"username"`
-		Password string `json:"password"`
-		SSL      bool   `json:"ssl"`
+		Host      string `json:"host"`
+		Port      int    `json:"port"`
+		Username  string `json:"username"`
+		Password  string `json:"password"`
+		SSL       bool   `json:"ssl"`
+		SslVerify bool   `json:"ssl_verify"`
 	} `json:"mqtt"`
 
 	UnitTemperature   string `json:"unit_temperature"`
@@ -533,19 +599,22 @@ type Config struct {
 // loadConfig loads configuration from file with fallback to defaults
 // func loadConfig(configPath string) Config {
 func loadConfig() (Config, error) {
+
 	defaultConfig := Config{
 		MQTT: struct {
-			Host     string `json:"host"`
-			Port     int    `json:"port"`
-			Username string `json:"username"`
-			Password string `json:"password"`
-			SSL      bool   `json:"ssl"`
+			Host      string `json:"host"`
+			Port      int    `json:"port"`
+			Username  string `json:"username"`
+			Password  string `json:"password"`
+			SSL       bool   `json:"ssl"`
+			SslVerify bool   `json:"ssl_verify"`
 		}{
-			Host:     "homeassistant",
-			Port:     1883,
-			Username: os.Getenv("MQTT_USERNAME"),
-			Password: os.Getenv("MQTT_PASSWORD"),
-			SSL:      false,
+			Host:      "homeassistant",
+			Port:      1883,
+			Username:  os.Getenv("MQTT_USERNAME"),
+			Password:  os.Getenv("MQTT_PASSWORD"),
+			SSL:       false,
+			SslVerify: false,
 		},
 
 		UnitTemperature:   "°C",  // UNIT_TEMPERATURE
@@ -581,7 +650,7 @@ func loadConfig() (Config, error) {
 	}
 
 	if envPass := os.Getenv("MQTT_PASSWORD"); envPass != "" {
-		config.MQTT.Password = envPass
+		config.MQTT.Password = strings.TrimSpace(envPass)
 	} else {
 		customLog("ERROR", "MQTT_PASSWORD is not defined in environment variables")
 		os.Exit(1)
@@ -591,12 +660,26 @@ func loadConfig() (Config, error) {
 		return Config{}, fmt.Errorf("mqtt username and password must be provided")
 	}
 
-	if config.MQTT.Port <= 0 || config.MQTT.Port > 65535 {
-		return Config{}, fmt.Errorf("mqtt port must be between 1 and 65535")
-	}
-
 	if config.MQTT.Username == "" || config.MQTT.Password == "" {
 		return Config{}, fmt.Errorf("mqtt username and password must be provided")
+	}
+
+	if envSSL := os.Getenv("MQTT_SSL"); envSSL != "" {
+		val := strings.TrimSpace(envSSL)
+		config.MQTT.SSL = strings.EqualFold(val, "true") ||
+			strings.EqualFold(val, "yes") ||
+			val == "1"
+	}
+
+	if envSSLVerify := os.Getenv("MQTT_SKIP_SSL_VERIFY"); envSSLVerify != "" {
+		val := strings.TrimSpace(envSSLVerify)
+		config.MQTT.SslVerify = strings.EqualFold(val, "true") ||
+			strings.EqualFold(val, "yes") ||
+			val == "1"
+	}
+
+	if config.MQTT.Port <= 0 || config.MQTT.Port > 65535 {
+		return Config{}, fmt.Errorf("mqtt port must be between 1 and 65535")
 	}
 
 	if haLanguage := os.Getenv("HA_LANGUAGE"); haLanguage != "" {
@@ -628,6 +711,8 @@ func loadConfig() (Config, error) {
 	// }
 
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
+	customLog("INFO", "Load variable ssl: '%t'", config.MQTT.SSL)
+	customLog("INFO", "Load variable ssl verify: '%t'", config.MQTT.SslVerify)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
 	customLog("INFO", "Load variable language: '%s'", config.Language)
 	customLog("DEBUG", "Load variable unit temperature: '%s'", config.UnitTemperature)
@@ -745,8 +830,17 @@ func calculateUvCategories(uvValue string) string {
 func mqttConnect(config Config) mqtt.Client {
 	opts := mqtt.NewClientOptions()
 
+	scheme := "tcp"
+	if config.MQTT.SSL {
+		scheme = "ssl"
+		opts.SetTLSConfig(&tls.Config{
+			MinVersion:         tls.VersionTLS12,
+			InsecureSkipVerify: config.MQTT.SslVerify,
+		})
+	}
+
 	// Configure broker connection string
-	broker := fmt.Sprintf("tcp://%s:%d", config.MQTT.Host, config.MQTT.Port)
+	broker := fmt.Sprintf("%s://%s:%d", scheme, config.MQTT.Host, config.MQTT.Port)
 	customLog("INFO", "Connecting to MQTT at: '%s' with user: '%s'", broker, config.MQTT.Username)
 
 	// Set credentials and broker URI
@@ -783,16 +877,44 @@ func mqttConnect(config Config) mqtt.Client {
 	opts.OnConnect = connectHandler
 	opts.OnConnectionLost = connectLostHandler
 
+	mqtt.ERROR = log.New(os.Stdout, "[MQTT-ERROR] ", 0)
+	mqtt.CRITICAL = log.New(os.Stdout, "[MQTT-CRIT] ", 0)
+
 	// Initialize the client and wait for a successful connection
 	client := mqtt.NewClient(opts)
-	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		customLog("ERROR", "MQTT Connection error: %v", token.Error())
+	token := client.Connect()
+	if !token.WaitTimeout(5 * time.Second) {
+		customLog("ERROR", "MQTT Fatal: Connection timeout")
+		os.Exit(1)
 	}
+	if err := token.Error(); err != nil {
+		customLog("ERROR", "MQTT Fatal: %v", err)
+		os.Exit(1)
+	}
+	time.Sleep(500 * time.Millisecond)
+	if !client.IsConnected() {
+		customLog("ERROR", "MQTT Fatal: Connection lost immediately after connecting")
+		os.Exit(1)
+	}
+
+	customLog("INFO", "Connecting to MQTT successfully!")
 
 	// Verify the actual protocol version used by the client
 	customLog("DEBUG", "Used MQTT protocol version: %d", opts.ProtocolVersion)
 
 	return client
+}
+
+func applySecurityHeaders(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("X-XSS-Protection", "1; mode=block")
+		w.Header().Set("Server", "GoWeatherStation")
+
+		// Pokračuj na skutočný handler (napr. handleData)
+		next.ServeHTTP(w, r)
+	})
 }
 
 func main() {
@@ -813,6 +935,11 @@ func main() {
 
 	// Establish MQTT connection
 	client := mqttConnect(config)
+	if client == nil {
+		customLog("ERROR", "MQTT connection failed, aborting")
+		os.Exit(1)
+	}
+
 	// Ensure the client disconnects gracefully on application exit
 	defer client.Disconnect(250)
 
@@ -834,7 +961,7 @@ func main() {
 	server := &http.Server{
 		// Addr:              ":" + strconv.Itoa(config.HttpServerPort),
 		Addr:              ":80",
-		Handler:           mux,
+		Handler:           applySecurityHeaders(mux),
 		ReadHeaderTimeout: 5 * time.Second,  // Protects against Slowloris attacks
 		ReadTimeout:       15 * time.Second, // Time to read request body
 		WriteTimeout:      15 * time.Second, // Time to write response
@@ -914,19 +1041,45 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 // Handles incoming HTTP requests from the weather station, processes the data, and publishes it to MQTT for Home Assistant integration
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
 	var sensors []HomeAssistantConfig
-	var data = make(map[string]string)
-
-	if err := r.ParseForm(); err != nil {
-		customLog("ERROR", "Message: %v", err)
+	if r.Method != http.MethodPost {
+		w.Header().Set("Allow", http.MethodPost)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 
+	// Add rate limiting
+	if !checkRateLimit() {
+		customLog("WARN", "Rate limit exceeded, rejecting request")
+		http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
+		return
+	}
+
+	// Validate Content-Type header to ensure it's a form submission
+	ct := r.Header.Get("Content-Type")
+	if !strings.HasPrefix(ct, "application/x-www-form-urlencoded") {
+		customLog("WARN", "Invalid Content-Type: %s", ct)
+		http.Error(w, "unsupported media type", http.StatusUnsupportedMediaType)
+		return
+	}
+
+	// Limit the size of the request body to prevent abuse and ensure stability
+	r.Body = http.MaxBytesReader(w, r.Body, 16*1024)
+
+	if err := r.ParseForm(); err != nil {
+		customLog("ERROR", "Failed to parse request form: %v", err)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
+
+	// Respond immediately to the station to avoid timeouts, while processing the data concurrently
 	w.WriteHeader(http.StatusOK)
 	if _, err := w.Write([]byte("success")); err != nil {
 		customLog("WARN", "Failed to write response to station: %v", err)
 	}
 
-	// load the data from the request form into a map, skipping empty keys or values
+	var data = make(map[string]string)
+
+	// Iterate over the form values and generate the data map
 	for key, values := range r.Form {
 		for _, val := range values {
 			// Skip empty entries
@@ -934,6 +1087,14 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 				customLog("WARN", "Skipping empty key or value - key=%q, value=%q", key, val)
 				continue
 			}
+
+			// Validate input
+			key, val, valid := validateInput(key, val)
+			if !valid {
+				customLog("WARN", "Skipping invalid input - key=%q", key)
+				continue
+			}
+
 			data[key] = val
 		}
 	}
