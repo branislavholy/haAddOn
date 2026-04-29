@@ -17,6 +17,8 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Skip if commit message starts with "chore(main): release"
+    if: "!startsWith(github.event.head_commit.message, 'chore(main): release')"
     env:
       flags: ""
     steps:
