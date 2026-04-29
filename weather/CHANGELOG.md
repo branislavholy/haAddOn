@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.20](https://github.com/branislavholy/haAddOn/compare/v1.8.19...v1.8.20) (2026-04-29)
+
+
+### Bug Fixes
+
+* update log level message ([672f87b](https://github.com/branislavholy/haAddOn/commit/672f87b4b8168a0a61430c75d8aa801e63dbb097))
+
 ## [1.8.19](https://github.com/branislavholy/haAddOn/compare/v1.8.18...v1.8.19) (2026-04-29)
 
 
