@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.15](https://github.com/branislavholy/haAddOn/compare/v1.8.14...v1.8.15) (2026-04-29)
+
+
+### Bug Fixes
+
+* improve stability ([d8512f2](https://github.com/branislavholy/haAddOn/commit/d8512f2a63fcd9809540ddf90e7f876a10c6881c))
+
 ## [1.8.14](https://github.com/branislavholy/haAddOn/compare/v1.8.13...v1.8.14) (2026-04-29)
 
 
