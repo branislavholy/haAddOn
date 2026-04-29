@@ -1051,19 +1051,18 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 
 	// Add rate limiting
 	if !checkRateLimit() {
-		customLog("WARN", "Rate limit exceeded, rejecting request")
 		customLog("ERROR", "Rate limit exceeded for request from %s", r.RemoteAddr)
 		http.Error(w, "rate limit exceeded", http.StatusTooManyRequests)
 		return
 	}
 
 	// Validate Content-Type header to ensure it's a form submission
-	ct := r.Header.Get("Content-Type")
-	if !strings.HasPrefix(ct, "application/x-www-form-urlencoded") {
-		customLog("WARN", "Invalid Content-Type: %s", ct)
-		http.Error(w, "unsupported media type", http.StatusUnsupportedMediaType)
-		return
-	}
+	// ct := r.Header.Get("Content-Type")
+	// if !strings.HasPrefix(ct, "application/x-www-form-urlencoded") {
+	// 	customLog("WARN", "Invalid Content-Type: %s", ct)
+	// 	http.Error(w, "unsupported media type", http.StatusUnsupportedMediaType)
+	// 	return
+	// }
 
 	// Limit the size of the request body to prevent abuse and ensure stability
 	r.Body = http.MaxBytesReader(w, r.Body, 16*1024)
