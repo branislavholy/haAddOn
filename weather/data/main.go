@@ -1040,15 +1040,14 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 // Handles incoming HTTP requests from the weather station, processes the data, and publishes it to MQTT for Home Assistant integration
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
-	customLog("DEBUG", "Start handleData method for request from %s", r.RemoteAddr)
-	customLog("WARN", "Start handleData method")
+	customLog("DEBUG", "Received request from %s with method %s", r.RemoteAddr, r.Method)
 	var sensors []HomeAssistantConfig
-	if r.Method != http.MethodPost {
-		w.Header().Set("Allow", http.MethodPost)
-		customLog("ERROR", "HTTP method %q not allowed, only POST is accepted", r.Method)
-		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-		return
-	}
+	// if r.Method != http.MethodPost {
+	// 	w.Header().Set("Allow", http.MethodPost)
+	// 	customLog("ERROR", "HTTP method %q not allowed, only POST is accepted", r.Method)
+	// 	http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	// 	return
+	// }
 
 	// Add rate limiting
 	if !checkRateLimit() {
