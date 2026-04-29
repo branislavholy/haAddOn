@@ -122,7 +122,7 @@ export UNIT_PRESSURE='hPa'
 <!-- x-release-please-start-version -->
 ```bash
 cd ~/workspace/haAddOn/weather
-podman build -f debug/Dockerfile --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.9.1' .
+podman build -f debug/Dockerfile --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.9.2' .
 
 ```
 <!-- x-release-please-end -->
@@ -131,7 +131,7 @@ podman build -f debug/Dockerfile --format docker --pull --rm --build-arg BUILD_F
 <!-- x-release-please-start-version -->
 ```bash
 cd ~/workspace/haAddOn/weather
-podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.9.1' .
+podman build --format docker --pull --rm --build-arg BUILD_FROM="ghcr.io/home-assistant/aarch64-base:latest" -t weather:latest -t 'weather:1.9.2' .
 
 ```
 <!-- x-release-please-end -->
@@ -171,7 +171,7 @@ podman run --rm --name weather-container -p 8000:8000 \
 ### Remove image
 <!-- x-release-please-start-version -->
 ```bash
-podman rmi weather:1.9.1 weather:latest
+podman rmi weather:1.9.2 weather:latest
 // remove all images
 podman images --filter reference='weather:*' -q | xargs podman rmi
 ```
