@@ -39,7 +39,7 @@ var currentLogLevelPriority int
 
 // define default variables
 var (
-	version = "1.8.19" // x-release-please-version
+	version = "1.8.18" // x-release-please-version
 	// Define by GoReleaser
 	date   = "unknown"
 	commit = "none"
@@ -1143,7 +1143,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		data["uvcategories"] = calculateUvCategories(uv)
 	}
 
-	customLog("INFO", "Received original map data: %v", data)
+	customLog("DEBUG", "Received original map data: %v", data)
 
 	// Load and parse the original JSON payload for logging purposes
 	jsonOriginalData, err := json.Marshal(data)
@@ -1151,7 +1151,7 @@ func handleData(w http.ResponseWriter, r *http.Request, config Config, client mq
 		customLog("ERROR", "Message: %v", err)
 		return
 	}
-	customLog("INFO", "Received original json payload: '%s'", jsonOriginalData)
+	customLog("DEBUG", "Received original json payload: '%s'", jsonOriginalData)
 
 	// Process and validate each sensor
 	for key, value := range data {
