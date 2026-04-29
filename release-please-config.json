@@ -8,9 +8,10 @@
       "draft": false,
       "prerelease": false,
       "extra-files": [
-        "Dockerfile",
         "config.yaml",
+        "data/DOCS.md",
         "data/main.go",
+        "Dockerfile",
         "README.md"
       ]
     }

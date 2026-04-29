@@ -15,9 +15,11 @@ options:
   precipitation: mm
   pressure: hPa
   speed: m/s
+  ssl: false
+  skipSslVerify: false
   hostname: ''
   port: 1883
-  username: branislav
+  username: ''
   password: ''
   log_level: info
 schema:
@@ -26,6 +28,8 @@ schema:
   precipitation: list(mm|in)
   pressure: list(hPa|mbar|mmHg|inHg)
   speed: list(m/s|km/h|mph|kn)
+  ssl: bool
+  skipSslVerify: bool
   hostname: str?
   port: int?
   username: str

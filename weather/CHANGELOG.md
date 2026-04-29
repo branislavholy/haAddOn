@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.9.2](https://github.com/branislavholy/haAddOn/compare/v1.9.1...v1.9.2) (2026-04-29)
+
+
+### Bug Fixes
+
+* improve stability ([eea5349](https://github.com/branislavholy/haAddOn/commit/eea5349d9ca654b0395b7917506e32b933ceba48))
+
+## [1.9.1](https://github.com/branislavholy/haAddOn/compare/v1.9.0...v1.9.1) (2026-04-29)
+
+
+### Bug Fixes
+
+* improve stability ([304d15b](https://github.com/branislavholy/haAddOn/commit/304d15ba47aaad31d5cb07550128e7475e9cdd66))
+
+## [1.9.0](https://github.com/branislavholy/haAddOn/compare/v1.8.12...v1.9.0) (2026-04-29)
+
+
+### Features
+
+* clean code and docs ([4638d36](https://github.com/branislavholy/haAddOn/commit/4638d36abaa713305e877a3a2a2e6d05e88392b4))
+
 ## [1.8.12](https://github.com/branislavholy/haAddOn/compare/v1.8.11...v1.8.12) (2026-04-24)
 
 

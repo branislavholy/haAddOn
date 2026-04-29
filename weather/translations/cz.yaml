@@ -13,7 +13,7 @@ configuration:
     description: "Uživatelské heslo pro MQTT servis API."
   port:
     name: "MQTT Port"
-    description: "Port pro MQTT servis API."
+    description: "Port pro MQTT servis API.\nNon SSL výchozí: 1883\nSSL výchozí: 8883"
   hostname:
     name: "MQTT Server"
     description: "Název serveru pro MQTT servis API. Pokud zůstane prázdný, bude použit výchozí název hostitele 'homeassistant'."
@@ -32,3 +32,9 @@ configuration:
   log_level:
     name: "Úroveň logování"
     description: "Úroveň logování pro aplikaci."
+  skipSslVerify:
+    name: "Přeskočit SSL ověřování"
+    description: "Přeskočit ověřování SSL certifikátu při připojení k MQTT brokeru."
+  ssl:
+    name: "Použít SSL"
+    description: "Použít SSL pro připojení k MQTT brokeru. Pokud je povoleno, výchozí port bude 8883 místo 1883."

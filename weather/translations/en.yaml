@@ -13,7 +13,7 @@ configuration:
     description: "The password for the MQTT service API."
   port:
     name: "MQTT Port"
-    description: "The port for the MQTT service API."
+    description: "The port for the MQTT service API.\nNon SSL default: 1883\nSSL default: 8883"
   hostname:
     name: "MQTT Host"
     description: "The hostname for the MQTT service API. If left empty, the default 'homeassistant' hostname will be used."
@@ -32,3 +32,9 @@ configuration:
   log_level:
     name: "Log Level"
     description: "The log level for the add-on."
+  skipSslVerify:
+    name: "Skip SSL Verification"
+    description: "Skip SSL certificate verification when connecting to the MQTT broker."
+  ssl:
+    name: "Use SSL"
+    description: "Use SSL/TLS when connecting to the MQTT broker. If enabled, the default port will be 8883 instead of 1883."
