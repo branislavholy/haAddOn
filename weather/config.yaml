@@ -1,6 +1,6 @@
 name: Garni weather station
 description: Weather data loader from Garni stations to Home Assistant
-version: 1.8.13
+version: 1.8.14
 init: false
 slug: garni_weather_station
 url: https://github.com/branislavholy/haAddOn/tree/main/weather
