@@ -6,7 +6,7 @@ export MQTT_SSL=${MQTT_SSL:-$(bashio::config 'ssl')}
 export MQTT_SKIP_SSL_VERIFY=${MQTT_SKIP_SSL_VERIFY:-$(bashio::config 'skipSslVerify')}
 export MQTT_HOSTNAME=${MQTT_HOSTNAME:-$(bashio::info.hostname)}
 export MQTT_PASSWORD=${MQTT_PASSWORD:-$(bashio::config 'password')}
-export MQTT_PORT=${MQTT_PORT:-1883}
+export MQTT_PORT=${MQTT_PORT:-$(bashio::config 'port')}
 export MQTT_USERNAME=${MQTT_USERNAME:-$(bashio::config 'username')}
 
 export UNIT_TEMPERATURE=${UNIT_TEMPERATURE:-$(bashio::config 'temperature')}
