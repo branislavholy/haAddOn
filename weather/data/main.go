@@ -712,7 +712,7 @@ func loadConfig() (Config, error) {
 
 	customLog("INFO", "Load variable port: '%d'", config.MQTT.Port)
 	customLog("INFO", "Load variable ssl: '%t'", config.MQTT.SSL)
-	customLog("INFO", "Load variable skipssl verify: '%t'", config.MQTT.SslVerify)
+	customLog("INFO", "Load variable skip ssl verify: '%t'", config.MQTT.SslVerify)
 	customLog("INFO", "Load variable username: '%s'", config.MQTT.Username)
 	customLog("INFO", "Load variable language: '%s'", config.Language)
 	customLog("DEBUG", "Load variable unit temperature: '%s'", config.UnitTemperature)
