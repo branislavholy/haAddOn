@@ -1040,6 +1040,7 @@ func registerSensors(client mqtt.Client, sensors []HomeAssistantConfig) {
 
 // Handles incoming HTTP requests from the weather station, processes the data, and publishes it to MQTT for Home Assistant integration
 func handleData(w http.ResponseWriter, r *http.Request, config Config, client mqtt.Client) {
+	customLog("INFO", "Start handleData method for request from %s", r.RemoteAddr)
 	var sensors []HomeAssistantConfig
 	if r.Method != http.MethodPost {
 		w.Header().Set("Allow", http.MethodPost)
