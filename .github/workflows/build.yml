@@ -28,7 +28,7 @@ jobs:
         with:
           token: ${{ secrets.RELEASE_PLEASE_TOKEN }}
 
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         # if: "!startsWith(github.event.head_commit.message, 'chore(main): release')"
         with:
           fetch-depth: 0
