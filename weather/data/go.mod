@@ -5,7 +5,7 @@ go 1.25.5
 require (
 	github.com/bcicen/go-units v1.0.5
 	github.com/eclipse/paho.mqtt.golang v1.5.1
-	golang.org/x/text v0.40.0
+	golang.org/x/text v0.41.0
 )
 
 require (
