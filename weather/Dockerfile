@@ -5,7 +5,7 @@ ARG RELEASE_TAG="1.8.21" # x-release-please-version
 ARG TARGETOS
 # ARG TARGETARCH
 
-RUN echo "Binnary: https://github.com/branislavholy/haAddOn/releases/download/v${RELEASE_TAG}/weather_${TARGETOS}_${TARGETARCH}.tar.gz"
+RUN echo "Binary: https://github.com/branislavholy/haAddOn/releases/download/v${RELEASE_TAG}/weather_${TARGETOS}_${TARGETARCH}.tar.gz"
 
 RUN ARCH=$(uname -m) && \
     wget -qO - https://github.com/branislavholy/haAddOn/releases/download/v${RELEASE_TAG}/weather_${TARGETOS}_${ARCH}.tar.gz | tar -xzvf - -C /usr/bin weather && \
