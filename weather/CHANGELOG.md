@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.23](https://github.com/branislavholy/haAddOn/compare/v1.8.22...v1.8.23) (2026-09-09)
+
+
+### Bug Fixes
+
+* **deps:** update module golang.org/x/text to v0.42.0 ([dd573af](https://github.com/branislavholy/haAddOn/commit/dd573afbad3022221d0aabab41733c6ce5c9704c))
+
 ## [1.8.22](https://github.com/branislavholy/haAddOn/compare/v1.8.21...v1.8.22) (2026-09-07)
 
 
