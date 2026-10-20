@@ -29,7 +29,7 @@ builds:
     goarm:
       - 6       # commonly maps to armel/armhf (v6)
       - 7       # commonly maps to armv7
-    mod_timestamp: "{{ .CommitTimestamp }}"
+    mod_timestamp: "{{ .CommitDate }}"
     flags:
       - -trimpath
     ldflags:
@@ -47,7 +47,7 @@ archives:
     # Strip any subdirectories from the binary itself
     strip_binary_directory: true
     builds_info:
-      mtime: "{{ .CommitTimestamp }}"
+      mtime: "{{ .CommitDate }}"
     # name_template: "{{ .Binary }}_{{ .Os }}_{{ .Arch }}"
     name_template: >-
       {{ .Binary }}_
