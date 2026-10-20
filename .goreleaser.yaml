@@ -29,7 +29,7 @@ builds:
     goarm:
       - 6       # commonly maps to armel/armhf (v6)
       - 7       # commonly maps to armv7
-    mod_timestamp: "{{ .CommitDate }}"
+    mod_timestamp: "{{ .CommitTimestamp }}"
     flags:
       - -trimpath
     ldflags:
