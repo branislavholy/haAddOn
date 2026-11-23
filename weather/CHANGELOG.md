@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.25](https://github.com/branislavholy/haAddOn/compare/v1.8.24...v1.8.25) (2026-11-23)
+
+
+### Bug Fixes
+
+* **deps:** update home-assistant-base-images ([3b95152](https://github.com/branislavholy/haAddOn/commit/3b95152200ea94383c88065335421d4f84c941c1))
+
 ## [1.8.24](https://github.com/branislavholy/haAddOn/compare/v1.8.23...v1.8.24) (2026-10-20)
 
 
