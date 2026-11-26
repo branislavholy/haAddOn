@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.8.26](https://github.com/branislavholy/haAddOn/compare/v1.8.25...v1.8.26) (2026-11-26)
+
+
+### Bug Fixes
+
+* **deps:** update module github.com/eclipse/paho.mqtt.golang to v1.5.2 ([d5b99b4](https://github.com/branislavholy/haAddOn/commit/d5b99b4e428403c6ab1490e1212445e24b9cf74a))
+
 ## [1.8.25](https://github.com/branislavholy/haAddOn/compare/v1.8.24...v1.8.25) (2026-11-23)
 
 
